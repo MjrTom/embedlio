@@ -11,7 +11,7 @@ namespace EmbedIO.Utilities
     /// <seealso cref="IMimeTypeProvider" />
     public sealed class MimeTypeProviderStack : IMimeTypeProvider
     {
-        private readonly Stack<IMimeTypeProvider> _providers = new Stack<IMimeTypeProvider>();
+        private readonly Stack<IMimeTypeProvider> _providers = new();
 
         /// <summary>
         /// <para>Pushes the specified MIME type provider on the stack.</para>
@@ -43,7 +43,7 @@ namespace EmbedIO.Utilities
         /// <inheritdoc />
         public bool TryDetermineCompression(string mimeType, out bool preferCompression)
         {
-            foreach (var provider in _providers)
+            foreach (IMimeTypeProvider provider in _providers)
             {
                 if (provider.TryDetermineCompression(mimeType, out preferCompression))
                     return true;

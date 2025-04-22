@@ -4,8 +4,8 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
+
 using EmbedIO.Internal;
 using EmbedIO.Utilities;
 
@@ -17,7 +17,7 @@ namespace EmbedIO.Net.Internal
     internal sealed partial class HttpListenerRequest : IHttpRequest
     {
         private static readonly byte[] HttpStatus100 = WebServer.DefaultEncoding.GetBytes("HTTP/1.1 100 Continue\r\n\r\n");
-        private static readonly char[] Separators = { ' ' };
+        private static readonly char[] Separators =[' '];
 
         private readonly HttpConnection _connection;
         private CookieList? _cookies;
@@ -36,7 +36,7 @@ namespace EmbedIO.Net.Internal
         /// <value>
         /// The accept types.
         /// </value>
-        public string[] AcceptTypes { get; private set; } = Array.Empty<string>();
+        public string[] AcceptTypes { get; private set; } =[];
 
         /// <inheritdoc />
         public Encoding ContentEncoding
@@ -78,7 +78,7 @@ namespace EmbedIO.Net.Internal
         public bool HasEntityBody => ContentLength64 > 0;
 
         /// <inheritdoc />
-        public NameValueCollection Headers { get; } = new ();
+        public NameValueCollection Headers { get; } = new();
 
         /// <inheritdoc />
         public string HttpMethod { get; private set; } = string.Empty;
@@ -124,7 +124,7 @@ namespace EmbedIO.Net.Internal
         public Version ProtocolVersion { get; private set; } = HttpVersion.Version11;
 
         /// <inheritdoc />
-        public NameValueCollection QueryString { get; } = new ();
+        public NameValueCollection QueryString { get; } = new();
 
         /// <inheritdoc />
         public string RawUrl { get; private set; } = string.Empty;
@@ -145,7 +145,7 @@ namespace EmbedIO.Net.Internal
 
         public string UserHostName => Headers[HttpHeaderNames.Host];
 
-        public string[] UserLanguages { get; private set; } = Array.Empty<string>();
+        public string[] UserLanguages { get; private set; } =[];
 
         /// <inheritdoc />
         public bool IsWebSocketRequest
@@ -177,7 +177,7 @@ namespace EmbedIO.Net.Internal
                 }
             }
 
-            HttpVerb = IsKnownHttpMethod(HttpMethod, out var verb) ? verb : HttpVerbs.Any;
+            HttpVerb = IsKnownHttpMethod(HttpMethod, out HttpVerbs verb) ? verb : HttpVerbs.Any;
 
             RawUrl = parts[1];
             if (parts[2].Length != 8 || !parts[2].StartsWith("HTTP/", StringComparison.Ordinal))
@@ -210,7 +210,7 @@ namespace EmbedIO.Net.Internal
                 return;
             }
 
-            var rawUri = UriUtility.StringToAbsoluteUri(RawUrl.ToLowerInvariant());
+            Uri? rawUri = UriUtility.StringToAbsoluteUri(RawUrl.ToLowerInvariant());
             var path = rawUri?.PathAndQuery ?? RawUrl;
 
             if (string.IsNullOrEmpty(host))
@@ -227,7 +227,7 @@ namespace EmbedIO.Net.Internal
             // var baseUri = $"{(IsSecureConnection ? "https" : "http")}://{host}:{LocalEndPoint.Port}";
             var baseUri = $"http://{host}:{LocalEndPoint.Port}";
 
-            if (!Uri.TryCreate(baseUri + path, UriKind.Absolute, out var url))
+            if (!Uri.TryCreate(baseUri + path, UriKind.Absolute, out Uri? url))
             {
                 _connection.SetError(WebUtility.HtmlEncode($"Invalid url: {baseUri}{path}"));
                 return;
@@ -235,7 +235,7 @@ namespace EmbedIO.Net.Internal
 
             Url = url;
             InitializeQueryString(Url.Query);
-            
+
             if (ContentLength64 == 0 && (HttpVerb == HttpVerbs.Post || HttpVerb == HttpVerbs.Put))
             {
                 return;
@@ -250,7 +250,7 @@ namespace EmbedIO.Net.Internal
         internal void AddHeader(string header)
         {
             var colon = header.IndexOf(':');
-            if (colon == -1 || colon == 0)
+            if (colon is ( -1 ) or 0)
             {
                 _connection.SetError("Bad Request");
                 return;
@@ -271,7 +271,7 @@ namespace EmbedIO.Net.Internal
                     break;
                 case "content-length":
                     Headers[HttpHeaderNames.ContentLength] = val.Trim();
-                    
+
                     if (ContentLength64 < 0)
                     {
                         _connection.SetError("Invalid Content-Length.");
@@ -409,7 +409,7 @@ namespace EmbedIO.Net.Internal
         {
             _cookies ??= new CookieList();
 
-            var cookieStrings = val.SplitByAny(';', ',')
+            System.Collections.Generic.IEnumerable<string> cookieStrings = val.SplitByAny(';', ',')
                 .Where(x => !string.IsNullOrEmpty(x));
             Cookie? current = null;
             var version = 0;

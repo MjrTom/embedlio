@@ -6,13 +6,8 @@ namespace EmbedIO.Samples
     /// <summary>
     /// Defines a very simple chat server.
     /// </summary>
-    public class WebSocketChatModule : WebSocketModule
+    public class WebSocketChatModule(string urlPath) : WebSocketModule(urlPath, true)
     {
-        public WebSocketChatModule(string urlPath)
-            : base(urlPath, true)
-        {
-        }
-
         /// <inheritdoc />
         protected override Task OnMessageReceivedAsync(
             IWebSocketContext context,
@@ -25,7 +20,7 @@ namespace EmbedIO.Samples
             => Task.WhenAll(
                 SendAsync(context, "Welcome to the chat room!"),
                 SendToOthersAsync(context, "Someone joined the chat room."));
-        
+
         /// <inheritdoc />
         protected override Task OnClientDisconnectedAsync(IWebSocketContext context)
             => SendToOthersAsync(context, "Someone left the chat room.");

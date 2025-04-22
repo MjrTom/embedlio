@@ -1,8 +1,9 @@
 ﻿using System.IO;
 using System.Linq;
-using System.Text;
+
 using EmbedIO.Files;
 using EmbedIO.Testing;
+
 using NUnit.Framework;
 
 namespace EmbedIO.Tests
@@ -20,33 +21,33 @@ namespace EmbedIO.Tests
         [TestCase("/sub/index.html", "index.html")]
         public void MapFile_ReturnsCorrectFileInfo(string urlPath, string name)
         {
-            var info = _fileProvider.MapUrlPath(urlPath, _mimeTypeProvider);
+            MappedResourceInfo? info = _fileProvider.MapUrlPath(urlPath, _mimeTypeProvider);
 
-            Assert.IsNotNull(info, "info != null");
-            Assert.IsTrue(info.IsFile, "info.IsFile == true");
-            Assert.AreEqual(name, info.Name, "info.Name has the correct value");
-            Assert.AreEqual(StockResource.GetLength(urlPath), info.Length, "info.Length has the correct value");
+            NUnit.Framework.Legacy.ClassicAssert.IsNotNull(info, "info != null");
+            NUnit.Framework.Legacy.ClassicAssert.IsTrue(info.IsFile, "info.IsFile == true");
+            NUnit.Framework.Legacy.ClassicAssert.AreEqual(name, info.Name, "info.Name has the correct value");
+            NUnit.Framework.Legacy.ClassicAssert.AreEqual(StockResource.GetLength(urlPath), info.Length, "info.Length has the correct value");
         }
 
         [TestCase("/index.html")]
         [TestCase("/sub/index.html")]
         public void OpenFile_ReturnsCorrectContent(string urlPath)
         {
-            var info = _fileProvider.MapUrlPath(urlPath, _mimeTypeProvider);
+            MappedResourceInfo? info = _fileProvider.MapUrlPath(urlPath, _mimeTypeProvider);
             var expectedText = StockResource.GetText(urlPath, WebServer.DefaultEncoding);
 
-            using var stream = _fileProvider.OpenFile(info.Path);
+            using Stream stream = _fileProvider.OpenFile(info.Path);
             using var reader = new StreamReader(stream, WebServer.DefaultEncoding, false, WebServer.StreamCopyBufferSize, true);
             var actualText = reader.ReadToEnd();
 
-            Assert.AreEqual(expectedText, actualText, "Content is the same as embedded resource");
+            NUnit.Framework.Legacy.ClassicAssert.AreEqual(expectedText, actualText, "Content is the same as embedded resource");
         }
 
         [Test]
         public void GetDirectoryEntries_ReturnsEmptyEnumerable()
         {
-            var entries = _fileProvider.GetDirectoryEntries(string.Empty, _mimeTypeProvider);
-            Assert.IsFalse(entries.Any(), "There are no entries");
+            System.Collections.Generic.IEnumerable<MappedResourceInfo> entries = _fileProvider.GetDirectoryEntries(string.Empty, _mimeTypeProvider);
+            NUnit.Framework.Legacy.ClassicAssert.IsFalse(entries.Any(), "There are no entries");
         }
     }
 }

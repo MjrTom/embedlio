@@ -1,5 +1,6 @@
 ﻿using EmbedIO.Utilities;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace EmbedIO.Tests.Utilities
 {
@@ -9,8 +10,8 @@ namespace EmbedIO.Tests.Utilities
         public void GetNext_ReturnsValidString()
         {
             var id = UniqueIdGenerator.GetNext();
-            Assert.IsNotNull(id);
-            Assert.IsNotEmpty(id);
+            NUnit.Framework.Legacy.ClassicAssert.IsNotNull(id);
+            NUnit.Framework.Legacy.ClassicAssert.IsNotEmpty(id);
         }
 
         [Test]

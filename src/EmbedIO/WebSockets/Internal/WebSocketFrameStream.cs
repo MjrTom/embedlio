@@ -5,22 +5,17 @@ using Swan;
 
 namespace EmbedIO.WebSockets.Internal
 {
-    internal class WebSocketFrameStream
+    internal class WebSocketFrameStream(Stream? stream, bool unmask = false)
     {
-        private readonly bool _unmask;
-        private readonly Stream? _stream;
-
-        public WebSocketFrameStream(Stream? stream, bool unmask = false)
-        {
-            _stream = stream;
-            _unmask = unmask;
-        }
+        private readonly bool _unmask = unmask;
+        private readonly Stream? _stream = stream;
 
         internal async Task<WebSocketFrame?> ReadFrameAsync(WebSocket webSocket)
         {
-            if (_stream == null) return null;
+            if (_stream == null)
+                return null;
 
-            var frame = ProcessHeader(await _stream.ReadBytesAsync(2).ConfigureAwait(false));
+            WebSocketFrame frame = ProcessHeader(await _stream.ReadBytesAsync(2).ConfigureAwait(false));
 
             await ReadExtendedPayloadLengthAsync(frame).ConfigureAwait(false);
             await ReadMaskingKeyAsync(frame).ConfigureAwait(false);
@@ -35,10 +30,10 @@ namespace EmbedIO.WebSockets.Internal
 
             return frame;
         }
-        
-        private static bool IsOpcodeData(byte opcode) => opcode == 0x1 || opcode == 0x2;
-        
-        private static bool IsOpcodeControl(byte opcode) => opcode > 0x7 && opcode < 0x10;
+
+        private static bool IsOpcodeData(byte opcode) => opcode is 0x1 or 0x2;
+
+        private static bool IsOpcodeControl(byte opcode) => opcode is > 0x7 and < 0x10;
 
         private static WebSocketFrame ProcessHeader(byte[] header)
         {
@@ -46,22 +41,22 @@ namespace EmbedIO.WebSockets.Internal
                 throw new WebSocketException("The header of a frame cannot be read from the stream.");
 
             // FIN
-            var fin = (header[0] & 0x80) == 0x80 ? Fin.Final : Fin.More;
+            Fin fin = (header[0] & 0x80) == 0x80 ? Fin.Final : Fin.More;
 
             // RSV1
-            var rsv1 = (header[0] & 0x40) == 0x40 ? Rsv.On : Rsv.Off;
+            Rsv rsv1 = (header[0] & 0x40) == 0x40 ? Rsv.On : Rsv.Off;
 
             // RSV2
-            var rsv2 = (header[0] & 0x20) == 0x20 ? Rsv.On : Rsv.Off;
+            Rsv rsv2 = (header[0] & 0x20) == 0x20 ? Rsv.On : Rsv.Off;
 
             // RSV3
-            var rsv3 = (header[0] & 0x10) == 0x10 ? Rsv.On : Rsv.Off;
+            Rsv rsv3 = (header[0] & 0x10) == 0x10 ? Rsv.On : Rsv.Off;
 
             // Opcode
             var opcode = (byte)(header[0] & 0x0f);
 
             // MASK
-            var mask = (header[1] & 0x80) == 0x80 ? Mask.On : Mask.Off;
+            Mask mask = (header[1] & 0x80) == 0x80 ? Mask.On : Mask.Off;
 
             // Payload Length
             var payloadLen = (byte)(header[1] & 0x7f);
@@ -77,18 +72,18 @@ namespace EmbedIO.WebSockets.Internal
 
             return new WebSocketFrame(fin, rsv1, rsv2, rsv3, (Opcode)opcode, mask, payloadLen);
         }
-        
+
         private async Task ReadExtendedPayloadLengthAsync(WebSocketFrame frame)
         {
             var len = frame.ExtendedPayloadLengthCount;
 
             if (len == 0)
             {
-                frame.ExtendedPayloadLength = Array.Empty<byte>();
+                frame.ExtendedPayloadLength =[];
                 return;
             }
 
-            var bytes = await _stream.ReadBytesAsync(len).ConfigureAwait(false);
+            var bytes = await _stream!.ReadBytesAsync(len).ConfigureAwait(false);
 
             if (bytes.Length != len)
             {
@@ -105,11 +100,11 @@ namespace EmbedIO.WebSockets.Internal
 
             if (len == 0)
             {
-                frame.MaskingKey = Array.Empty<byte>();
+                frame.MaskingKey =[];
                 return;
             }
 
-            var bytes = await _stream.ReadBytesAsync(len).ConfigureAwait(false);
+            var bytes = await _stream!.ReadBytesAsync(len).ConfigureAwait(false);
             if (bytes.Length != len)
             {
                 throw new WebSocketException(
@@ -133,8 +128,8 @@ namespace EmbedIO.WebSockets.Internal
                 throw new WebSocketException(CloseStatusCode.TooBig, "A frame has a long payload length.");
 
             var bytes = frame.PayloadLength < 127
-                ? await _stream.ReadBytesAsync((int)len).ConfigureAwait(false)
-                : await _stream.ReadBytesAsync((int)len, 1024).ConfigureAwait(false);
+                ? await _stream!.ReadBytesAsync((int)len).ConfigureAwait(false)
+                : await _stream!.ReadBytesAsync((int)len, 1024).ConfigureAwait(false);
 
             if (bytes.Length != (int)len)
             {

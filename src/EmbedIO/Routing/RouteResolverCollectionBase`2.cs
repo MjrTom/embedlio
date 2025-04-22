@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using EmbedIO.Internal;
+
 using EmbedIO.Utilities;
+
 using Swan;
-using Swan.Collections;
 using Swan.Configuration;
 
 namespace EmbedIO.Routing
@@ -21,7 +21,7 @@ namespace EmbedIO.Routing
     public abstract class RouteResolverCollectionBase<TData, TResolver> : ConfiguredObject
         where TResolver : RouteResolverBase<TData>
     {
-        private readonly List<TResolver> _resolvers = new List<TResolver>();
+        private readonly List<TResolver> _resolvers = new();
 
         /// <summary>
         /// Associates some data and a route to a handler.
@@ -84,10 +84,10 @@ namespace EmbedIO.Routing
         /// <seealso cref="RouteResolverBase{TData}.ResolveAsync"/>
         public async Task<RouteResolutionResult> ResolveAsync(IHttpContext context)
         {
-            var result = RouteResolutionResult.RouteNotMatched;
-            foreach (var resolver in _resolvers)
+            RouteResolutionResult result = RouteResolutionResult.RouteNotMatched;
+            foreach (TResolver resolver in _resolvers)
             {
-                var resolverResult = await resolver.ResolveAsync(context).ConfigureAwait(false);
+                RouteResolutionResult resolverResult = await resolver.ResolveAsync(context).ConfigureAwait(false);
                 OnResolverCalled(context, resolver, resolverResult);
                 if (resolverResult == RouteResolutionResult.Success)
                     return RouteResolutionResult.Success;
@@ -108,7 +108,7 @@ namespace EmbedIO.Routing
         /// <inheritdoc />
         protected override void OnBeforeLockConfiguration()
         {
-            foreach (var resolver in _resolvers)
+            foreach (TResolver resolver in _resolvers)
                 resolver.Lock();
         }
 
@@ -122,7 +122,7 @@ namespace EmbedIO.Routing
         /// <param name="matcher">The <see cref="RouteMatcher"/>to match URL paths against.</param>
         /// <returns>A newly-constructed instance of <typeparamref name="TResolver"/>.</returns>
         protected abstract TResolver CreateResolver(RouteMatcher matcher);
-        
+
         /// <summary>
         /// <para>Called by <see cref="ResolveAsync"/> when a resolver's
         /// <see cref="RouteResolverBase{TData}.ResolveAsync">ResolveAsync</see> method has been called
@@ -138,7 +138,7 @@ namespace EmbedIO.Routing
 
         private TResolver GetResolver(RouteMatcher matcher)
         {
-            var resolver = _resolvers.FirstOrDefault(r => r.Matcher.Equals(matcher));
+            TResolver? resolver = _resolvers.FirstOrDefault(r => r.Matcher.Equals(matcher));
             if (resolver != null)
                 return resolver;
 

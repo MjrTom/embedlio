@@ -6,7 +6,7 @@ using EmbedIO.WebApi;
 
 namespace EmbedIO
 {
-    partial class WebModuleContainerExtensions
+    static partial class WebModuleContainerExtensions
     {
         /// <summary>
         /// Creates an instance of <see cref="WebApiModule"/> using the default response serializer

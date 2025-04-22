@@ -5,7 +5,8 @@ namespace EmbedIO.Tests.TestObjects
 {
     public static class PeopleRepository
     {
-        public static List<Person> Database => new List<Person> {
+        public static List<Person> Database => new()
+        {
             new Person {
                 Key = 1,
                 Name = "Mario Di Vece",

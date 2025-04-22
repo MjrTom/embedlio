@@ -30,10 +30,10 @@ namespace EmbedIO.Files
 
         private static readonly Stopwatch TimeBase = Stopwatch.StartNew();
 
-        private static readonly object DefaultSyncRoot = new object();
+        private static readonly object DefaultSyncRoot = new();
         private static FileCache? _defaultInstance;
 
-        private readonly ConcurrentDictionary<string, Section> _sections = new ConcurrentDictionary<string, Section>(StringComparer.Ordinal);
+        private readonly ConcurrentDictionary<string, Section> _sections = new(StringComparer.Ordinal);
         private int _sectionCount; // Because ConcurrentDictionary<,>.Count is locking.
         private int _maxSizeKb = DefaultMaxSizeKb;
         private int _maxFileSizeKb = DefaultMaxFileSizeKb;
@@ -51,8 +51,7 @@ namespace EmbedIO.Files
 
                 lock (DefaultSyncRoot)
                 {
-                    if (_defaultInstance == null)
-                        _defaultInstance = new FileCache();
+                    _defaultInstance ??= new FileCache();
                 }
 
                 return _defaultInstance;
@@ -134,7 +133,7 @@ namespace EmbedIO.Files
                 if (cancellationToken.IsCancellationRequested)
                     return;
 
-                var section = GetSectionWithLeastRecentItem();
+                Section? section = GetSectionWithLeastRecentItem();
                 if (section == null)
                     return;
 
@@ -160,11 +159,11 @@ namespace EmbedIO.Files
         {
             Section? result = null;
             var earliestTime = long.MaxValue;
-            foreach (var pair in _sections)
+            foreach (KeyValuePair<string, Section> pair in _sections)
             {
-                var section = pair.Value;
+                Section section = pair.Value;
                 var time = section.GetLeastRecentUseTime();
-               
+
                 if (time < earliestTime)
                 {
                     result = section;

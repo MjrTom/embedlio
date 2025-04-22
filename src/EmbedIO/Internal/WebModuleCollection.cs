@@ -16,7 +16,7 @@ namespace EmbedIO.Internal
 
         internal void StartAll(CancellationToken cancellationToken)
         {
-            foreach (var (name, module) in WithSafeNames)
+            foreach ((var name, IWebModule module) in WithSafeNames)
             {
                 $"Starting module {name}...".Debug(_logSource);
                 module.Start(cancellationToken);
@@ -29,13 +29,13 @@ namespace EmbedIO.Internal
                 return;
 
             var requestedPath = context.RequestedPath;
-            foreach (var (name, module) in WithSafeNames)
+            foreach ((var name, IWebModule module) in WithSafeNames)
             {
-                var routeMatch = module.MatchUrlPath(requestedPath);
+                Routing.RouteMatch routeMatch = module.MatchUrlPath(requestedPath);
                 if (routeMatch == null)
                     continue;
 
-                $"[{context.Id}] Processing with {name}.".Debug(_logSource); 
+                $"[{context.Id}] Processing with {name}.".Debug(_logSource);
                 context.GetImplementation().Route = routeMatch;
                 await module.HandleRequestAsync(context).ConfigureAwait(false);
                 if (context.IsHandled)

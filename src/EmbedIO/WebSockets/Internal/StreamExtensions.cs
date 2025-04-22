@@ -8,7 +8,7 @@ namespace EmbedIO.WebSockets.Internal
 {
     internal static class StreamExtensions
     {
-        private static readonly byte[] LastByte = { 0x00 };
+        private static readonly byte[] LastByte =[0x00];
 
         // Compresses or decompresses a stream using the specified compression method.
         public static async Task<MemoryStream> CompressAsync(

@@ -2,6 +2,8 @@
 {
     internal static class ObjectExtensions
     {
-        public static void Void<T>(this T @this) { }
+        public static void Void<T>(this T @this)
+        {
+        }
     }
 }

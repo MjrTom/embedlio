@@ -1,7 +1,4 @@
-﻿using System;
-using System.Text;
-
-namespace EmbedIO.Testing
+﻿namespace EmbedIO.Testing
 {
     partial class MockFileProvider
     {
@@ -9,13 +6,13 @@ namespace EmbedIO.Testing
         {
             public MockFile(byte[] data)
             {
-                Data = data ?? Array.Empty<byte>();
+                Data = data ??[];
             }
 
             public MockFile(string text)
             {
                 Data = text == null
-                    ? Array.Empty<byte>()
+                    ?[]
                     : WebServer.DefaultEncoding.GetBytes(text);
             }
 
@@ -23,14 +20,14 @@ namespace EmbedIO.Testing
 
             public void SetData(byte[] data)
             {
-                Data = data ?? Array.Empty<byte>();
+                Data = data ??[];
                 Touch();
             }
 
             public void SetData(string text)
             {
                 Data = text == null
-                    ? Array.Empty<byte>()
+                    ?[]
                     : WebServer.DefaultEncoding.GetBytes(text);
                 Touch();
             }

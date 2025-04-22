@@ -2,6 +2,7 @@
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+
 using NUnit.Framework;
 
 namespace EmbedIO.Tests.Issues
@@ -26,10 +27,10 @@ namespace EmbedIO.Tests.Issues
             using var client = new HttpClient(handler);
             client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("gzip"));
             client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("deflat"));
-            using var response = await client.GetAsync(DefaultUrl).ConfigureAwait(false);
+            using HttpResponseMessage response = await client.GetAsync(DefaultUrl).ConfigureAwait(false);
             var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
-            Assert.AreEqual("12345", responseString);
+            NUnit.Framework.Legacy.ClassicAssert.AreEqual("12345", responseString);
         }
     }
 }

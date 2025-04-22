@@ -37,34 +37,25 @@ namespace EmbedIO.WebSockets
     /// contains one or more <c>SecWebSocketProtocol</c> headers that specify
     /// the list of accepted subprotocols (if any).
     /// </remarks>
-    public abstract class WebSocketModule : WebModuleBase, IDisposable
+    /// <remarks>
+    /// Initializes a new instance of the <see cref="WebSocketModule" /> class.
+    /// </remarks>
+    /// <param name="urlPath">The URL path of the WebSocket endpoint to serve.</param>
+    /// <param name="enableConnectionWatchdog">If set to <see langword="true"/>,
+    /// contexts representing closed connections will automatically be purged
+    /// from <see cref="ActiveContexts"/> every 30 seconds..</param>
+    public abstract class WebSocketModule(string urlPath, bool enableConnectionWatchdog) : WebModuleBase(urlPath), IDisposable
     {
         private const int ReceiveBufferSize = 2048;
 
-        private readonly bool _enableConnectionWatchdog;
-        private readonly List<string> _protocols = new List<string>();
-        private readonly ConcurrentDictionary<string, IWebSocketContext> _contexts = new ConcurrentDictionary<string, IWebSocketContext>();
+        private readonly bool _enableConnectionWatchdog = enableConnectionWatchdog;
+        private readonly List<string> _protocols = new();
+        private readonly ConcurrentDictionary<string, IWebSocketContext> _contexts = new();
         private bool _isDisposing;
-        private int _maxMessageSize;
-        private TimeSpan _keepAliveInterval;
-        private Encoding _encoding;
+        private int _maxMessageSize = 0;
+        private TimeSpan _keepAliveInterval = TimeSpan.FromSeconds(30);
+        private Encoding _encoding = Encoding.UTF8;
         private PeriodicTask? _connectionWatchdog;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="WebSocketModule" /> class.
-        /// </summary>
-        /// <param name="urlPath">The URL path of the WebSocket endpoint to serve.</param>
-        /// <param name="enableConnectionWatchdog">If set to <see langword="true"/>,
-        /// contexts representing closed connections will automatically be purged
-        /// from <see cref="ActiveContexts"/> every 30 seconds..</param>
-        protected WebSocketModule(string urlPath, bool enableConnectionWatchdog)
-            : base(urlPath)
-        {
-            _enableConnectionWatchdog = enableConnectionWatchdog;
-            _maxMessageSize = 0;
-            _keepAliveInterval = TimeSpan.FromSeconds(30);
-            _encoding = Encoding.UTF8;
-        }
 
         /// <inheritdoc />
         public sealed override bool IsFinalHandler => true;
@@ -109,7 +100,7 @@ namespace EmbedIO.WebSockets
         /// to send a string. The default is <see cref="System.Text.Encoding.UTF8"/> per the WebSocket specification.
         /// </summary>
         /// <exception cref="ArgumentNullException">This property is being set to <see langword="null"/>.</exception>
-        protected Encoding Encoding
+        protected Encoding? Encoding
         {
             get => _encoding;
             set
@@ -123,7 +114,7 @@ namespace EmbedIO.WebSockets
         /// Gets a list of <see cref="IWebSocketContext"/> interfaces
         /// representing the currently connected clients.
         /// </summary>
-        protected IReadOnlyList<IWebSocketContext> ActiveContexts
+        protected IReadOnlyList<IWebSocketContext>? ActiveContexts
         {
             get
             {
@@ -133,7 +124,7 @@ namespace EmbedIO.WebSockets
                 // https://github.com/dotnet/corefx/blob/master/src/System.Collections.Concurrent/src/System/Collections/Concurrent/ConcurrentDictionary.cs#L1990
                 // https://github.com/mono/mono/blob/master/mcs/class/referencesource/mscorlib/system/collections/Concurrent/ConcurrentDictionary.cs#L1961
                 // However there is no formal guarantee, so be ready to convert to a list, just in case.
-                var values = _contexts.Values;
+                ICollection<IWebSocketContext> values = _contexts.Values;
                 return values is IReadOnlyList<IWebSocketContext> list
                     ? list
                     : values.ToList();
@@ -159,7 +150,7 @@ namespace EmbedIO.WebSockets
                                          ?.Select(s => s.Trim())
                                          .Where(s => s.Length > 0)
                                          .ToArray()
-                                  ?? Array.Empty<string>();
+                                  ??[];
             string acceptedProtocol;
             bool acceptConnection;
             if (_protocols.Count > 0)
@@ -185,13 +176,13 @@ namespace EmbedIO.WebSockets
                 return;
             }
 
-            var contextImpl = context.GetImplementation();
+            IHttpContextImpl contextImpl = context.GetImplementation();
             $"{BaseRoute} - Accepting WebSocket connection with subprotocol \"{acceptedProtocol}\"".Debug(nameof(WebSocketModule));
-            var webSocketContext = await contextImpl.AcceptWebSocketAsync(
-                    requestedProtocols, 
-                    acceptedProtocol, 
-                    ReceiveBufferSize, 
-                    KeepAliveInterval, 
+            IWebSocketContext webSocketContext = await contextImpl.AcceptWebSocketAsync(
+                    requestedProtocols,
+                    acceptedProtocol,
+                    ReceiveBufferSize,
+                    KeepAliveInterval,
                     context.CancellationToken).ConfigureAwait(false);
 
             PurgeDisconnectedContexts();
@@ -207,7 +198,7 @@ namespace EmbedIO.WebSockets
                 if (webSocketContext.WebSocket is SystemWebSocket systemWebSocket)
                 {
                     await ProcessSystemContext(
-                            webSocketContext, 
+                            webSocketContext,
                             systemWebSocket.UnderlyingWebSocket,
                             context.CancellationToken).ConfigureAwait(false);
                 }
@@ -239,7 +230,8 @@ namespace EmbedIO.WebSockets
             {
                 _connectionWatchdog = new PeriodicTask(
                     TimeSpan.FromSeconds(30),
-                    ct => {
+                    ct =>
+                    {
                         PurgeDisconnectedContexts();
                         return Task.CompletedTask;
                     },
@@ -385,7 +377,7 @@ namespace EmbedIO.WebSockets
         {
             try
             {
-                await context.WebSocket.SendAsync(payload ?? Array.Empty<byte>(), false, context.CancellationToken)
+                await context.WebSocket.SendAsync(payload ??[], false, context.CancellationToken)
                     .ConfigureAwait(false);
             }
             catch (Exception ex)
@@ -519,7 +511,8 @@ namespace EmbedIO.WebSockets
             // so it may call methods that require a lock on _contextsAccess.
             // Otherwise, calling e.g. Broadcast would result in a deadlock.
 #pragma warning disable CS4014 // Call is not awaited - it is intentionally forked.
-            _ = Task.Run(async () => {
+            _ = Task.Run(async () =>
+            {
                 try
                 {
                     await OnClientDisconnectedAsync(context).ConfigureAwait(false);
@@ -538,10 +531,10 @@ namespace EmbedIO.WebSockets
 
         private void PurgeDisconnectedContexts()
         {
-            var contexts = _contexts.Values;
+            ICollection<IWebSocketContext> contexts = _contexts.Values;
             var totalCount = _contexts.Count;
             var purgedCount = 0;
-            foreach (var context in contexts)
+            foreach (IWebSocketContext context in contexts)
             {
                 if (context.WebSocket == null || context.WebSocket.State == WebSocketState.Open)
                     continue;
@@ -572,9 +565,9 @@ namespace EmbedIO.WebSockets
                 }
             };
 
-            while (context.WebSocket.State == WebSocketState.Open
-                || context.WebSocket.State == WebSocketState.CloseReceived
-                || context.WebSocket.State == WebSocketState.CloseSent)
+            while (context.WebSocket.State is WebSocketState.Open
+                or WebSocketState.CloseReceived
+                or WebSocketState.CloseSent)
             {
                 await Task.Delay(500, cancellationToken).ConfigureAwait(false);
             }
@@ -625,7 +618,8 @@ namespace EmbedIO.WebSockets
                 }
 
                 // if we're at the end of the message, process the message
-                if (!receiveResult.EndOfMessage) continue;
+                if (!receiveResult.EndOfMessage)
+                    continue;
 
                 await OnMessageReceivedAsync(context, receivedMessage.ToArray(), receiveResult)
                     .ConfigureAwait(false);

@@ -49,12 +49,12 @@
                 return true;
             }
 
-            var acceptableMethods = preferCompression
-                ? new[] { CompressionMethod.Gzip, CompressionMethod.Deflate, CompressionMethod.None }
-                : new[] { CompressionMethod.None, CompressionMethod.Gzip, CompressionMethod.Deflate };
+            CompressionMethod[] acceptableMethods = preferCompression
+                ?[CompressionMethod.Gzip, CompressionMethod.Deflate, CompressionMethod.None]
+                :[CompressionMethod.None, CompressionMethod.Gzip, CompressionMethod.Deflate];
             var acceptableMethodNames = preferCompression
                 ? new[] { CompressionMethodNames.Gzip, CompressionMethodNames.Deflate, CompressionMethodNames.None }
-                : new[] { CompressionMethodNames.None, CompressionMethodNames.Gzip, CompressionMethodNames.Deflate };
+                :[CompressionMethodNames.None, CompressionMethodNames.Gzip, CompressionMethodNames.Deflate];
 
             var acceptableMethodIndex = @this.FindPreferredIndex(acceptableMethodNames);
             if (acceptableMethodIndex < 0)

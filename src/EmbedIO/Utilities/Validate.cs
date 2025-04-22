@@ -18,7 +18,7 @@ namespace EmbedIO.Utilities
         public static T NotNull<T>(string argumentName, T? value)
             where T : class
             => value ?? throw new ArgumentNullException(argumentName);
-        
+
         /// <summary>
         /// Ensures that a <see langword="string"/> argument is neither <see langword="null"/> nor the empty string.
         /// </summary>
@@ -37,7 +37,7 @@ namespace EmbedIO.Utilities
 
             return value;
         }
-        
+
         /// <summary>
         /// Ensures that a valid URL can be constructed from a <see langword="string"/> argument.
         /// </summary>
@@ -55,8 +55,8 @@ namespace EmbedIO.Utilities
         /// </exception>
         /// <seealso cref="Url(string,string,Uri,bool)"/>
         public static string Url(
-            string argumentName, 
-            string value, 
+            string argumentName,
+            string value,
             UriKind uriKind = UriKind.RelativeOrAbsolute,
             bool enforceHttp = false)
         {
@@ -96,7 +96,7 @@ namespace EmbedIO.Utilities
         /// <para>- or -</para>
         /// <para><paramref name="value"/> is not a valid URL.</para>
         /// <para>- or -</para>
-        /// <para><paramref name="enforceHttp"/> is <see langword="true"/>, 
+        /// <para><paramref name="enforceHttp"/> is <see langword="true"/>,
         /// and the combination of <paramref name="baseUri"/> and <paramref name="value"/> has a scheme
         /// that is neither <c>http</c> nor <c>https</c>.</para>
         /// </exception>

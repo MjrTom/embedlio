@@ -1,6 +1,6 @@
 ﻿using NUnit.Framework;
+
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace EmbedIO.Tests.Issues
@@ -25,10 +25,10 @@ namespace EmbedIO.Tests.Issues
             _ = server.RunAsync();
 
             using var client = new HttpClient();
-            using var response = await client.GetAsync(DefaultUrl).ConfigureAwait(false);
+            using HttpResponseMessage response = await client.GetAsync(DefaultUrl).ConfigureAwait(false);
             var responseArray = await response.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
 
-            Assert.AreEqual(ok[0], responseArray[0]);
+            NUnit.Framework.Legacy.ClassicAssert.AreEqual(ok[0], responseArray[0]);
         }
 
         [Test]
@@ -47,10 +47,10 @@ namespace EmbedIO.Tests.Issues
             _ = server.RunAsync();
 
             using var client = new HttpClient();
-            using var response = await client.GetAsync("http://localhost:1234/").ConfigureAwait(false);
+            using HttpResponseMessage response = await client.GetAsync("http://localhost:1234/").ConfigureAwait(false);
             var responseArray = await response.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
 
-            Assert.AreEqual(ok[0], responseArray[0]);
+            NUnit.Framework.Legacy.ClassicAssert.AreEqual(ok[0], responseArray[0]);
         }
     }
 }

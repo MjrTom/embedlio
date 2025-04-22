@@ -25,8 +25,8 @@ namespace EmbedIO.Security
         /// </summary>
         public const int DefaultMaxMatchCount = 10;
 
-        private readonly ConcurrentDictionary<IPAddress, ConcurrentBag<long>> _failRegexMatches = new ConcurrentDictionary<IPAddress, ConcurrentBag<long>>();
-        private readonly ConcurrentDictionary<string, Regex> _failRegex = new ConcurrentDictionary<string, Regex>();
+        private readonly ConcurrentDictionary<IPAddress, ConcurrentBag<long>> _failRegexMatches = new();
+        private readonly ConcurrentDictionary<string, Regex> _failRegex = new();
         private readonly IPBanningModule _parent;
         private readonly int _secondsMatchingPeriod;
         private readonly int _maxMatchCount;
@@ -64,7 +64,7 @@ namespace EmbedIO.Security
         public Task<bool> ValidateIPAddress(IPAddress address)
         {
             var minTime = DateTime.Now.AddSeconds(-1 * _secondsMatchingPeriod).Ticks;
-            var shouldBan = _failRegexMatches.TryGetValue(address, out var attempts) &&
+            var shouldBan = _failRegexMatches.TryGetValue(address, out ConcurrentBag<long>? attempts) &&
                             attempts.Count(x => x >= minTime) >= _maxMatchCount;
 
             return Task.FromResult(shouldBan);
@@ -79,9 +79,10 @@ namespace EmbedIO.Security
         {
             var minTime = DateTime.Now.AddSeconds(-1 * _secondsMatchingPeriod).Ticks;
 
-            foreach (var k in _failRegexMatches.Keys)
+            foreach (IPAddress k in _failRegexMatches.Keys)
             {
-                if (!_failRegexMatches.TryGetValue(k, out var failRegexMatches)) continue;
+                if (!_failRegexMatches.TryGetValue(k, out ConcurrentBag<long>? failRegexMatches))
+                    continue;
 
                 var recentMatches = new ConcurrentBag<long>(failRegexMatches.Where(x => x >= minTime));
                 if (!recentMatches.Any())
@@ -130,11 +131,12 @@ namespace EmbedIO.Security
             if (!_parent.Configuration.ShouldContinue(address))
                 return;
 
-            foreach (var regex in _failRegex.Values)
+            foreach (Regex regex in _failRegex.Values)
             {
                 try
                 {
-                    if (!regex.IsMatch(message)) continue;
+                    if (!regex.IsMatch(message))
+                        continue;
 
                     _failRegexMatches.GetOrAdd(address, new ConcurrentBag<long>()).Add(DateTime.Now.Ticks);
                     break;
@@ -177,15 +179,15 @@ namespace EmbedIO.Security
             /// <inheritdoc />
             public LogLevel LogLevel => LogLevel.Trace;
 
-            public void Dispose() 
-            { 
+            public void Dispose()
+            {
                 // DO nothing
             }
 
             /// <inheritdoc />
             public void Log(LogMessageReceivedEventArgs logEvent)
             {
-                var clientAddress = _parent._parent.ClientAddress;
+                IPAddress? clientAddress = _parent._parent.ClientAddress;
 
                 if (clientAddress == null || string.IsNullOrWhiteSpace(logEvent.Message))
                     return;

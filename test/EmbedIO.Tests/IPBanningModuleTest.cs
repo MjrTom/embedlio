@@ -22,13 +22,13 @@ namespace EmbedIO.Tests
         }
 
         private HttpRequestMessage GetNotFoundRequest() =>
-            new HttpRequestMessage(HttpMethod.Get, $"{WebServerUrl}/api/notFound");
+            new(HttpMethod.Get, $"{WebServerUrl}/api/notFound");
 
         private HttpRequestMessage GetEmptyRequest() =>
-            new HttpRequestMessage(HttpMethod.Get, $"{WebServerUrl}/api/empty");
+            new(HttpMethod.Get, $"{WebServerUrl}/api/empty");
 
         private HttpRequestMessage GetUnauthorizedRequest() =>
-            new HttpRequestMessage(HttpMethod.Get, $"{WebServerUrl}/api/unauthorized");
+            new(HttpMethod.Get, $"{WebServerUrl}/api/unauthorized");
 
         private IPAddress Localhost { get; } = IPAddress.Parse("127.0.0.1");
 
@@ -43,9 +43,9 @@ namespace EmbedIO.Tests
 
             // Giving some time for logging
             await Task.Delay(200);
-            var response = await Client.SendAsync(GetNotFoundRequest());
+            HttpResponseMessage response = await Client.SendAsync(GetNotFoundRequest());
 
-            Assert.AreEqual(HttpStatusCode.Forbidden, response.StatusCode, "Status Code Forbidden");
+            NUnit.Framework.Legacy.ClassicAssert.AreEqual(HttpStatusCode.Forbidden, response.StatusCode, "Status Code Forbidden");
         }
 
         [Test]
@@ -53,13 +53,13 @@ namespace EmbedIO.Tests
         {
             IPBanningModule.TryUnbanIP(Localhost);
 
-            var response = await Client.SendAsync(GetNotFoundRequest());
-            Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode, "Status Code NotFound");
+            HttpResponseMessage response = await Client.SendAsync(GetNotFoundRequest());
+            NUnit.Framework.Legacy.ClassicAssert.AreEqual(HttpStatusCode.NotFound, response.StatusCode, "Status Code NotFound");
 
             IPBanningModule.TryBanIP(Localhost, 10);
 
             response = await Client.SendAsync(GetNotFoundRequest());
-            Assert.AreEqual(HttpStatusCode.Forbidden, response.StatusCode, "Status Code Forbidden");
+            NUnit.Framework.Legacy.ClassicAssert.AreEqual(HttpStatusCode.Forbidden, response.StatusCode, "Status Code Forbidden");
         }
 
         [Test]
@@ -67,13 +67,13 @@ namespace EmbedIO.Tests
         {
             IPBanningModule.TryUnbanIP(Localhost);
 
-            var response = await Client.SendAsync(GetNotFoundRequest());
-            Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode, "Status Code NotFound");
+            HttpResponseMessage response = await Client.SendAsync(GetNotFoundRequest());
+            NUnit.Framework.Legacy.ClassicAssert.AreEqual(HttpStatusCode.NotFound, response.StatusCode, "Status Code NotFound");
 
             IPBanningModule.TryBanIP(Localhost, TimeSpan.FromMinutes(10));
 
             response = await Client.SendAsync(GetNotFoundRequest());
-            Assert.AreEqual(HttpStatusCode.Forbidden, response.StatusCode, "Status Code Forbidden");
+            NUnit.Framework.Legacy.ClassicAssert.AreEqual(HttpStatusCode.Forbidden, response.StatusCode, "Status Code Forbidden");
         }
 
         [Test]
@@ -81,13 +81,13 @@ namespace EmbedIO.Tests
         {
             IPBanningModule.TryUnbanIP(Localhost);
 
-            var response = await Client.SendAsync(GetNotFoundRequest());
-            Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode, "Status Code NotFound");
+            HttpResponseMessage response = await Client.SendAsync(GetNotFoundRequest());
+            NUnit.Framework.Legacy.ClassicAssert.AreEqual(HttpStatusCode.NotFound, response.StatusCode, "Status Code NotFound");
 
             IPBanningModule.TryBanIP(Localhost, DateTime.Now.AddMinutes(10));
 
             response = await Client.SendAsync(GetNotFoundRequest());
-            Assert.AreEqual(HttpStatusCode.Forbidden, response.StatusCode, "Status Code Forbidden");
+            NUnit.Framework.Legacy.ClassicAssert.AreEqual(HttpStatusCode.Forbidden, response.StatusCode, "Status Code Forbidden");
         }
 
         [Test]
@@ -98,20 +98,20 @@ namespace EmbedIO.Tests
             _ = await Client.SendAsync(GetNotFoundRequest());
             _ = await Client.SendAsync(GetNotFoundRequest());
             _ = await Client.SendAsync(GetNotFoundRequest());
-            
+
             // Giving some time for logging
             await Task.Delay(200);
-            var response = await Client.SendAsync(GetNotFoundRequest());
+            HttpResponseMessage response = await Client.SendAsync(GetNotFoundRequest());
 
-            Assert.AreEqual(HttpStatusCode.Forbidden, response.StatusCode, "Status Code Forbidden");
+            NUnit.Framework.Legacy.ClassicAssert.AreEqual(HttpStatusCode.Forbidden, response.StatusCode, "Status Code Forbidden");
 
-            var bannedIps = IPBanningModule.GetBannedIPs();
+            System.Collections.Generic.IEnumerable<BanInfo> bannedIps = IPBanningModule.GetBannedIPs();
 
-            foreach (var address in bannedIps)
+            foreach (BanInfo address in bannedIps)
                 IPBanningModule.TryUnbanIP(address.IPAddress);
 
             response = await Client.SendAsync(GetNotFoundRequest());
-            Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode, "Status Code NotFound");
+            NUnit.Framework.Legacy.ClassicAssert.AreEqual(HttpStatusCode.NotFound, response.StatusCode, "Status Code NotFound");
         }
 
         [Test]
@@ -123,9 +123,9 @@ namespace EmbedIO.Tests
             {
                 await Client.SendAsync(GetEmptyRequest());
             }
-            
-            var response = await Client.SendAsync(GetEmptyRequest());
-            Assert.AreEqual(HttpStatusCode.Forbidden, response.StatusCode, "Status Code Forbidden");
+
+            HttpResponseMessage response = await Client.SendAsync(GetEmptyRequest());
+            NUnit.Framework.Legacy.ClassicAssert.AreEqual(HttpStatusCode.Forbidden, response.StatusCode, "Status Code Forbidden");
         }
     }
 }

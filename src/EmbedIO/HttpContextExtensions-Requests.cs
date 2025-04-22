@@ -7,10 +7,10 @@ using Swan;
 
 namespace EmbedIO
 {
-    partial class HttpContextExtensions
+    static partial class HttpContextExtensions
     {
-        private static readonly object FormDataKey = new object();
-        private static readonly object QueryDataKey = new object();
+        private static readonly object FormDataKey = new();
+        private static readonly object QueryDataKey = new();
 
         /// <summary>
         /// Asynchronously retrieves the request body as an array of <see langword="byte"/>s.
@@ -22,7 +22,7 @@ namespace EmbedIO
         public static async Task<byte[]> GetRequestBodyAsByteArrayAsync(this IHttpContext @this)
         {
             using var buffer = new MemoryStream();
-            using var stream = @this.OpenRequestStream();
+            using Stream stream = @this.OpenRequestStream();
             await stream.CopyToAsync(buffer, WebServer.StreamCopyBufferSize, @this.CancellationToken).ConfigureAwait(false);
             return buffer.ToArray();
         }
@@ -48,7 +48,7 @@ namespace EmbedIO
         /// <exception cref="NullReferenceException"><paramref name="this"/> is <see langword="null"/>.</exception>
         public static async Task<string> GetRequestBodyAsStringAsync(this IHttpContext @this)
         {
-            using var reader = @this.OpenRequestText();
+            using TextReader reader = @this.OpenRequestText();
             return await reader.ReadToEndAsync().ConfigureAwait(false);
         }
 
@@ -75,7 +75,7 @@ namespace EmbedIO
         /// whose result will be the deserialized data.</returns>
         /// <exception cref="NullReferenceException"><paramref name="this"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="deserializer"/> is <see langword="null"/>.</exception>
-        public static Task<TData> GetRequestDataAsync<TData>(this IHttpContext @this,RequestDeserializerCallback<TData> deserializer)
+        public static Task<TData> GetRequestDataAsync<TData>(this IHttpContext @this, RequestDeserializerCallback<TData> deserializer)
             => Validate.NotNull(nameof(deserializer), deserializer)(@this);
 
         /// <summary>
@@ -96,7 +96,7 @@ namespace EmbedIO
                 NameValueCollection result;
                 try
                 {
-                    using var reader = @this.OpenRequestText();
+                    using TextReader reader = @this.OpenRequestText();
                     result = UrlEncodedDataParser.Parse(await reader.ReadToEndAsync().ConfigureAwait(false), false);
                 }
                 catch (Exception e)

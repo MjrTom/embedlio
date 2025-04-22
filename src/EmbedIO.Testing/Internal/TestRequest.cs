@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
@@ -20,7 +20,7 @@ namespace EmbedIO.Testing.Internal
             _content = Validate.NotNull(nameof(clientRequest), clientRequest).Content;
 
             var headers = new NameValueCollection();
-            foreach (var pair in clientRequest.Headers)
+            foreach (System.Collections.Generic.KeyValuePair<string, System.Collections.Generic.IEnumerable<string>> pair in clientRequest.Headers)
             {
                 var values = pair.Value.ToArray();
                 switch (values.Length)
@@ -38,12 +38,12 @@ namespace EmbedIO.Testing.Internal
                         break;
                 }
 
-                if (pair.Key == HttpHeaderNames.Cookie) Cookies = CookieList.Parse(string.Join(",", values));
+                if (pair.Key == HttpHeaderNames.Cookie)
+                    Cookies = CookieList.Parse(string.Join(",", values));
             }
 
             Headers = headers;
-            if (Cookies == null)
-                Cookies = new CookieList();
+            Cookies ??= new CookieList();
 
             ProtocolVersion = clientRequest.Version;
             KeepAlive = !(clientRequest.Headers.ConnectionClose ?? true);
@@ -117,7 +117,7 @@ namespace EmbedIO.Testing.Internal
 
             if (method == System.Net.Http.HttpMethod.Options)
                 return HttpVerbs.Options;
-            
+
 #if NETSTANDARD2_0
             if (method == AdditionalHttpMethods.Patch)
                 return HttpVerbs.Patch;

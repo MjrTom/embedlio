@@ -1,6 +1,8 @@
 ﻿using EmbedIO.Sessions;
 using EmbedIO.Tests.TestObjects;
+
 using NUnit.Framework;
+
 using System;
 using System.Linq;
 using System.Net;
@@ -20,7 +22,8 @@ namespace EmbedIO.Tests
         protected override void OnSetUp()
         {
             Server
-                .WithSessionManager(new LocalSessionManager {
+                .WithSessionManager(new LocalSessionManager
+                {
                     SessionDuration = TimeSpan.FromSeconds(1),
                 })
                 .WithWebApi("/api", m => m.RegisterController<TestLocalSessionController>())
@@ -34,7 +37,7 @@ namespace EmbedIO.Tests
 
         protected void ClearServerCookies()
         {
-            foreach (var cookie in Client.CookieContainer.GetCookies(new Uri(WebServerUrl)).Cast<Cookie>())
+            foreach (Cookie cookie in Client.CookieContainer.GetCookies(new Uri(WebServerUrl)).Cast<Cookie>())
             {
                 cookie.Expired = true;
             }
@@ -42,13 +45,13 @@ namespace EmbedIO.Tests
 
         protected async Task ValidateCookie(HttpRequestMessage request)
         {
-            using (var response = await Client.SendAsync(request))
+            using (HttpResponseMessage response = await Client.SendAsync(request))
             {
-                Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "Status Code OK");
+                NUnit.Framework.Legacy.ClassicAssert.AreEqual(HttpStatusCode.OK, response.StatusCode, "Status Code OK");
             }
 
-            Assert.IsNotNull(Client.CookieContainer, "Cookies are not null");
-            Assert.Greater(
+            NUnit.Framework.Legacy.ClassicAssert.IsNotNull(Client.CookieContainer, "Cookies are not null");
+            NUnit.Framework.Legacy.ClassicAssert.Greater(
                 Client.CookieContainer.GetCookies(new Uri(WebServerUrl)).Count,
                 0,
                 "Cookies are not empty");
@@ -62,37 +65,37 @@ namespace EmbedIO.Tests
                 var request = new HttpRequestMessage(HttpMethod.Get,
                     WebServerUrl + TestLocalSessionController.PutDataPath);
 
-                using (var response = await Client.SendAsync(request))
+                using (HttpResponseMessage response = await Client.SendAsync(request))
                 {
-                    Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "Status Code OK");
+                    NUnit.Framework.Legacy.ClassicAssert.AreEqual(HttpStatusCode.OK, response.StatusCode, "Status Code OK");
 
                     var body = await response.Content.ReadAsStringAsync();
 
-                    Assert.AreEqual(TestLocalSessionController.MyData, body);
+                    NUnit.Framework.Legacy.ClassicAssert.AreEqual(TestLocalSessionController.MyData, body);
                 }
 
                 request = new HttpRequestMessage(HttpMethod.Get,
                     WebServerUrl + TestLocalSessionController.DeleteSessionPath);
 
-                using (var response = await Client.SendAsync(request))
+                using (HttpResponseMessage response = await Client.SendAsync(request))
                 {
-                    Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "Status Code OK");
+                    NUnit.Framework.Legacy.ClassicAssert.AreEqual(HttpStatusCode.OK, response.StatusCode, "Status Code OK");
 
                     var body = await response.Content.ReadAsStringAsync();
 
-                    Assert.AreEqual("Deleted", body);
+                    NUnit.Framework.Legacy.ClassicAssert.AreEqual("Deleted", body);
                 }
 
                 request = new HttpRequestMessage(HttpMethod.Get,
                     WebServerUrl + TestLocalSessionController.GetDataPath);
 
-                using (var response = await Client.SendAsync(request))
+                using (HttpResponseMessage response = await Client.SendAsync(request))
                 {
-                    Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "Status Code OK");
+                    NUnit.Framework.Legacy.ClassicAssert.AreEqual(HttpStatusCode.OK, response.StatusCode, "Status Code OK");
 
                     var body = await response.Content.ReadAsStringAsync();
 
-                    Assert.AreEqual(string.Empty, body);
+                    NUnit.Framework.Legacy.ClassicAssert.AreEqual(string.Empty, body);
                 }
             }
 
@@ -105,13 +108,13 @@ namespace EmbedIO.Tests
 
                 request = new HttpRequestMessage(HttpMethod.Get, WebServerUrl);
                 await ValidateCookie(request);
-                Assert.AreEqual(firstCookie, Client.CookieContainer.GetCookieHeader(new Uri(WebServerUrl)));
+                NUnit.Framework.Legacy.ClassicAssert.AreEqual(firstCookie, Client.CookieContainer.GetCookieHeader(new Uri(WebServerUrl)));
 
                 ClearServerCookies();
 
                 request = new HttpRequestMessage(HttpMethod.Get, WebServerUrl);
                 await ValidateCookie(request);
-                Assert.AreNotEqual(firstCookie, Client.CookieContainer.GetCookieHeader(new Uri(WebServerUrl)));
+                NUnit.Framework.Legacy.ClassicAssert.AreNotEqual(firstCookie, Client.CookieContainer.GetCookieHeader(new Uri(WebServerUrl)));
             }
         }
 
@@ -124,14 +127,14 @@ namespace EmbedIO.Tests
                     WebServerUrl + TestLocalSessionController.GetCookiePath);
                 var uri = new Uri(WebServerUrl + TestLocalSessionController.GetCookiePath);
 
-                using var response = await Client.SendAsync(request);
-                Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "Status OK");
-                var responseCookies = Client.CookieContainer.GetCookies(uri).Cast<Cookie>();
-                Assert.IsNotNull(responseCookies, "Cookies are not null");
+                using HttpResponseMessage response = await Client.SendAsync(request);
+                NUnit.Framework.Legacy.ClassicAssert.AreEqual(HttpStatusCode.OK, response.StatusCode, "Status OK");
+                System.Collections.Generic.IEnumerable<Cookie> responseCookies = Client.CookieContainer.GetCookies(uri).Cast<Cookie>();
+                NUnit.Framework.Legacy.ClassicAssert.IsNotNull(responseCookies, "Cookies are not null");
 
-                Assert.Greater(responseCookies.Count(), 0, "Cookies are not empty");
-                var cookieName = responseCookies.FirstOrDefault(c => c.Name == TestLocalSessionController.CookieName);
-                Assert.AreEqual(TestLocalSessionController.CookieName, cookieName?.Name);
+                NUnit.Framework.Legacy.ClassicAssert.Greater(responseCookies.Count(), 0, "Cookies are not empty");
+                Cookie? cookieName = responseCookies.FirstOrDefault(c => c.Name == TestLocalSessionController.CookieName);
+                NUnit.Framework.Legacy.ClassicAssert.AreEqual(TestLocalSessionController.CookieName, cookieName?.Name);
             }
 
             [Test]
@@ -139,7 +142,7 @@ namespace EmbedIO.Tests
             {
                 var request = new HttpRequestMessage(HttpMethod.Get, WebServerUrl);
                 await ValidateCookie(request);
-                Assert.IsNotEmpty(
+                NUnit.Framework.Legacy.ClassicAssert.IsNotEmpty(
                     Client.CookieContainer.GetCookieHeader(new Uri(WebServerUrl)),
                     "Cookie content is not null");
             }

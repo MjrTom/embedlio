@@ -43,7 +43,7 @@ namespace EmbedIO
         private static async Task<TData> JsonInternal<TData>(IHttpContext context, JsonSerializerCase jsonSerializerCase)
         {
             string body;
-            using (var reader = context.OpenRequestText())
+            using (System.IO.TextReader reader = context.OpenRequestText())
             {
                 body = await reader.ReadToEndAsync().ConfigureAwait(false);
             }

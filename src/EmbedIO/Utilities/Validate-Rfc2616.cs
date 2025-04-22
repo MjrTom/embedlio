@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace EmbedIO.Utilities
 {
-    partial class Validate
+    static partial class Validate
     {
         private static readonly char[] ValidRfc2616TokenChars = GetValidRfc2616TokenChars();
 

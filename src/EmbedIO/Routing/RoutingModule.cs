@@ -6,17 +6,12 @@ namespace EmbedIO.Routing
     /// A module that handles requests by resolving route / method pairs associated with handlers.
     /// </summary>
     /// <seealso cref="WebModuleBase" />
-    public class RoutingModule : RoutingModuleBase
+    /// <inheritdoc cref="WebModuleBase(string)"/>
+    /// <remarks>
+    /// Initializes a new instance of the <see cref="RoutingModule"/> class.
+    /// </remarks>
+    public class RoutingModule(string baseRoute) : RoutingModuleBase(baseRoute)
     {
-        /// <inheritdoc cref="WebModuleBase(string)"/>
-        /// <summary>
-        /// Initializes a new instance of the <see cref="RoutingModule"/> class.
-        /// </summary>
-        public RoutingModule(string baseRoute)
-            : base(baseRoute)
-        {
-        }
-
         /// <summary>
         /// Associates a HTTP method and a route to a handler.
         /// </summary>

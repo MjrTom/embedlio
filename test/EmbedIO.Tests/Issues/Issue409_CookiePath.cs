@@ -1,6 +1,8 @@
 ﻿using EmbedIO.Routing;
 using EmbedIO.WebApi;
+
 using NUnit.Framework;
+
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -29,13 +31,13 @@ namespace EmbedIO.Tests.Issues
 
             using var client = new HttpClient(handler);
 
-            using var responseOne = await client.GetAsync($"{DefaultUrl}v1/test").ConfigureAwait(false);
+            using HttpResponseMessage responseOne = await client.GetAsync($"{DefaultUrl}v1/test").ConfigureAwait(false);
             var responseOneString = await responseOne.Content.ReadAsStringAsync().ConfigureAwait(false);
 
-            using var responseTwo = await client.GetAsync($"{DefaultUrl}v2/test").ConfigureAwait(false);
+            using HttpResponseMessage responseTwo = await client.GetAsync($"{DefaultUrl}v2/test").ConfigureAwait(false);
             var responseTwoString = await responseTwo.Content.ReadAsStringAsync().ConfigureAwait(false);
 
-            Assert.AreEqual(responseOneString, responseTwoString);
+            NUnit.Framework.Legacy.ClassicAssert.AreEqual(responseOneString, responseTwoString);
         }
 
         private class CookieController : WebApiController

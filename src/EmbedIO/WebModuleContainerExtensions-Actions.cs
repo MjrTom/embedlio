@@ -1,11 +1,11 @@
 ﻿using System;
+
 using EmbedIO.Actions;
 using EmbedIO.Utilities;
-using Swan;
 
 namespace EmbedIO
 {
-    partial class WebModuleContainerExtensions
+    static partial class WebModuleContainerExtensions
     {
         /// <summary>
         /// Creates an instance of <see cref="ActionModule"/> and adds it to a module container.

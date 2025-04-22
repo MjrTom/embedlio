@@ -45,7 +45,7 @@ namespace EmbedIO.Files
         {
             @this.ContentCaching = value;
             return @this;
-        }   
+        }
 
         /// <summary>
         /// Enables caching of file contents and directory listings on a module.
@@ -83,8 +83,8 @@ namespace EmbedIO.Files
             @this.Cache.MaxFileSizeKb = maxFileSizeKb;
             @this.Cache.MaxSizeKb = maxSizeKb;
             return @this;
-        }    
-        
+        }
+
         /// <summary>
         /// Disables caching of file contents and directory listings on a module.
         /// </summary>

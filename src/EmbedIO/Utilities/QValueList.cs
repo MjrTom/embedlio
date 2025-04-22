@@ -31,7 +31,7 @@ namespace EmbedIO.Utilities
         // The part of string before the match contains the value and parameters (if any).
         // The part of string after the match contains the extensions (if any).
         // If there is no match, the whole string is just value and parameters (if any).
-        private static readonly Regex QualityValueRegex = new Regex(
+        private static readonly Regex QualityValueRegex = new(
             @";[ \t]*q=(?:(?:1(?:\.(?:0{1,3}))?)|(?:(0)(?:\.(\d{1,3}))?))[ \t]*(?:;|,|$)",
             RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.Singleline);
 
@@ -110,7 +110,7 @@ namespace EmbedIO.Utilities
         /// <returns><see langword="true"/>if <paramref name="value"/> is a candidate;
         /// otherwise, <see langword="false"/>.</returns>
         public bool IsCandidate(string value)
-            => TryGetCandidateValue(Validate.NotNull(nameof(value), value), out var candidate) && candidate.Weight > 0;
+            => TryGetCandidateValue(Validate.NotNull(nameof(value), value), out (int Weight, int Ordinal) candidate) && candidate.Weight > 0;
 
         /// <summary>
         /// Attempts to determine whether the weight of a possible candidate.
@@ -122,7 +122,7 @@ namespace EmbedIO.Utilities
         /// otherwise, <see langword="false"/>.</returns>
         public bool TryGetWeight(string value, out int weight)
         {
-            var result = TryGetCandidateValue(Validate.NotNull(nameof(value), value), out var candidate);
+            var result = TryGetCandidateValue(Validate.NotNull(nameof(value), value), out (int Weight, int Ordinal) candidate);
             weight = candidate.Weight;
             return result;
         }
@@ -163,7 +163,8 @@ namespace EmbedIO.Utilities
         {
             var result = new Dictionary<string, (int Weight, int Ordinal)>();
 
-            if (headerValues == null) return result;
+            if (headerValues == null)
+                return result;
 
             foreach (var headerValue in headerValues)
                 ParseCore(headerValue, result);
@@ -187,11 +188,11 @@ namespace EmbedIO.Utilities
 
                 string name;
                 var weight = 1000;
-                var match = QualityValueRegex.Match(text, position, stop - position);
+                Match match = QualityValueRegex.Match(text, position, stop - position);
                 if (match.Success)
                 {
-                    var groups = match.Groups;
-                    var wholeMatch = groups[0];
+                    GroupCollection groups = match.Groups;
+                    Group wholeMatch = groups[0];
                     name = text.Substring(position, wholeMatch.Index - position).Trim();
                     if (groups[1].Success)
                     {
@@ -259,7 +260,7 @@ namespace EmbedIO.Utilities
                 if (value == null)
                     continue;
 
-                if (TryGetCandidateValue(value, out var candidateValue) && CompareQualities(candidateValue, bestValue) > 0)
+                if (TryGetCandidateValue(value, out (int Weight, int Ordinal) candidateValue) && CompareQualities(candidateValue, bestValue) > 0)
                 {
                     result = value;
                     best = i;

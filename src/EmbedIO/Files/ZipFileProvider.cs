@@ -1,9 +1,9 @@
 ﻿using EmbedIO.Utilities;
+
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
 using System.Threading;
 
 namespace EmbedIO.Files
@@ -12,9 +12,15 @@ namespace EmbedIO.Files
     /// Provides access to files contained in a <c>.zip</c> file to a <see cref="FileModule"/>.
     /// </summary>
     /// <seealso cref="IFileProvider" />
-    public class ZipFileProvider : IDisposable, IFileProvider
+    /// <remarks>
+    /// Initializes a new instance of the <see cref="ZipFileProvider"/> class.
+    /// </remarks>
+    /// <param name="stream">The stream that contains the archive.</param>
+    /// <param name="leaveOpen"><see langword="true"/> to leave the stream open after the web server
+    /// is disposed; otherwise, <see langword="false"/>.</param>
+    public class ZipFileProvider(Stream stream, bool leaveOpen = false) : IDisposable, IFileProvider
     {
-        private readonly ZipArchive _zipArchive;
+        private readonly ZipArchive _zipArchive = new(stream, ZipArchiveMode.Read, leaveOpen);
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ZipFileProvider"/> class.
@@ -23,17 +29,6 @@ namespace EmbedIO.Files
         public ZipFileProvider(string zipFilePath)
             : this(new FileStream(Validate.LocalPath(nameof(zipFilePath), zipFilePath, true), FileMode.Open))
         {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ZipFileProvider"/> class.
-        /// </summary>
-        /// <param name="stream">The stream that contains the archive.</param>
-        /// <param name="leaveOpen"><see langword="true"/> to leave the stream open after the web server
-        /// is disposed; otherwise, <see langword="false"/>.</param>
-        public ZipFileProvider(Stream stream, bool leaveOpen = false)
-        {
-            _zipArchive = new ZipArchive(stream, ZipArchiveMode.Read, leaveOpen);
         }
 
         /// <summary>
@@ -74,15 +69,15 @@ namespace EmbedIO.Files
 
             urlPath = Uri.UnescapeDataString(urlPath);
 
-            var entry = _zipArchive.GetEntry(urlPath.Substring(1));
+            ZipArchiveEntry? entry = _zipArchive.GetEntry(urlPath.Substring(1));
             if (entry == null)
                 return null;
-            
+
             return MappedResourceInfo.ForFile(
-                entry.FullName, 
-                entry.Name, 
-                entry.LastWriteTime.DateTime, 
-                entry.Length, 
+                entry.FullName,
+                entry.Name,
+                entry.LastWriteTime.DateTime,
+                entry.Length,
                 mimeTypeProvider.GetMimeType(Path.GetExtension(entry.Name)));
         }
 
@@ -92,7 +87,7 @@ namespace EmbedIO.Files
 
         /// <inheritdoc />
         public IEnumerable<MappedResourceInfo> GetDirectoryEntries(string path, IMimeTypeProvider mimeTypeProvider)
-            => Enumerable.Empty<MappedResourceInfo>();
+            =>[];
 
         /// <summary>
         /// Releases unmanaged and - optionally - managed resources.

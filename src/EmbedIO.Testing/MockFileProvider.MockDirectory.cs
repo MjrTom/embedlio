@@ -7,11 +7,11 @@ namespace EmbedIO.Testing
     {
         private sealed class MockDirectory : MockDirectoryEntry, IDictionary<string, MockDirectoryEntry>
         {
-            readonly Dictionary<string, MockDirectoryEntry> _entries = new Dictionary<string, MockDirectoryEntry>();
+            readonly Dictionary<string, MockDirectoryEntry> _entries = new();
 
             public IEnumerator<KeyValuePair<string, MockDirectoryEntry>> GetEnumerator() => _entries.GetEnumerator();
 
-            IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable) _entries).GetEnumerator();
+            IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)_entries).GetEnumerator();
 
             public void Add(KeyValuePair<string, MockDirectoryEntry> item) => (_entries as ICollection<KeyValuePair<string, MockDirectoryEntry>>).Add(item);
 

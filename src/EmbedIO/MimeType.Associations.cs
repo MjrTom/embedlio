@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace EmbedIO
 {
-    partial class MimeType
+    static partial class MimeType
     {
         // -------------------------------------------------------------------------------------------------
         //

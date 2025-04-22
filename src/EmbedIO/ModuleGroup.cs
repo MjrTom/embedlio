@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Collections.Concurrent;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+
 using EmbedIO.Internal;
 using EmbedIO.Utilities;
 
@@ -22,25 +21,18 @@ namespace EmbedIO
     /// <seealso cref="WebModuleBase" />
     /// <seealso cref="IDisposable" />
     /// <seealso cref="IWebModuleContainer" />
-    public class ModuleGroup : WebModuleBase, IDisposable, IWebModuleContainer, IMimeTypeCustomizer
+    /// <remarks>
+    /// Initializes a new instance of the <see cref="ModuleGroup" /> class.
+    /// </remarks>
+    /// <param name="baseRoute">The base route served by this module.</param>
+    /// <param name="isFinalHandler">The value to set the <see cref="IWebModule.IsFinalHandler" /> property to.
+    /// See the help for the property for more information.</param>
+    /// <seealso cref="IWebModule.BaseRoute" />
+    /// <seealso cref="IWebModule.IsFinalHandler" />
+    public class ModuleGroup(string baseRoute, bool isFinalHandler) : WebModuleBase(baseRoute), IDisposable, IWebModuleContainer, IMimeTypeCustomizer
     {
-        private readonly WebModuleCollection _modules;
-        private readonly MimeTypeCustomizer _mimeTypeCustomizer = new MimeTypeCustomizer();
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ModuleGroup" /> class.
-        /// </summary>
-        /// <param name="baseRoute">The base route served by this module.</param>
-        /// <param name="isFinalHandler">The value to set the <see cref="IWebModule.IsFinalHandler" /> property to.
-        /// See the help for the property for more information.</param>
-        /// <seealso cref="IWebModule.BaseRoute" />
-        /// <seealso cref="IWebModule.IsFinalHandler" />
-        public ModuleGroup(string baseRoute, bool isFinalHandler)
-            : base(baseRoute)
-        {
-            IsFinalHandler = isFinalHandler;
-            _modules = new WebModuleCollection(nameof(ModuleGroup));
-        }
+        private readonly WebModuleCollection _modules = new(nameof(ModuleGroup));
+        private readonly MimeTypeCustomizer _mimeTypeCustomizer = new();
 
         /// <summary>
         /// Finalizes an instance of the <see cref="ModuleGroup"/> class.
@@ -51,7 +43,7 @@ namespace EmbedIO
         }
 
         /// <inheritdoc />
-        public sealed override bool IsFinalHandler { get; }
+        public sealed override bool IsFinalHandler { get; } = isFinalHandler;
 
         /// <inheritdoc />
         public IComponentCollection<IWebModule> Modules => _modules;

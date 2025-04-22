@@ -4,18 +4,13 @@ using Swan.Formatters;
 
 namespace EmbedIO.Tests.TestObjects
 {
-    public class TestWebSocket : WebSocketModule
+    public class TestWebSocket(string urlPath) : WebSocketModule(urlPath, true)
     {
-        public TestWebSocket(string urlPath)
-            : base(urlPath, true)
-        {
-        }
-
         protected override Task OnMessageReceivedAsync(IWebSocketContext context, byte[] rxBuffer, IWebSocketReceiveResult rxResult)
             => SendAsync(context, "HELLO");
     }
 
-    public class BigDataWebSocket : WebSocketModule
+    public class BigDataWebSocket(string urlPath) : WebSocketModule(urlPath, true)
     {
         public static readonly object BigDataObject = new
         {
@@ -2862,24 +2857,14 @@ i01jQpAUwrKkbVu2EzqXmNMgrAdDISXyvKBRr9frjUbDN8eG0uB5gWdshYxag9Ymu4MthcVMpvwB
 cygSR/MggDhTGBrfglUEKIXXbcbfwgukfyVEJJPOIP0xTtdAhAKBTNyWZuTIcRmIjIcgEEau",
         };
 
-        public BigDataWebSocket(string urlPath)
-            : base(urlPath, true)
-        {
-        }
-
         protected override Task OnMessageReceivedAsync(IWebSocketContext context, byte[] rxBuffer, IWebSocketReceiveResult rxResult)
             => SendAsync(context, Json.Serialize(BigDataObject));
     }
 
-    public class CloseWebSocket : WebSocketModule
+    public class CloseWebSocket(string urlPath) : WebSocketModule(urlPath, true)
     {
-        public CloseWebSocket(string urlPath)
-            : base(urlPath, true)
-        {
-        }
-
         protected override Task OnMessageReceivedAsync(
-            IWebSocketContext context, 
+            IWebSocketContext context,
             byte[] rxBuffer,
             IWebSocketReceiveResult rxResult)
             => Task.CompletedTask;

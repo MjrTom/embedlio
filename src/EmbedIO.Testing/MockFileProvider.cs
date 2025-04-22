@@ -68,9 +68,9 @@ namespace EmbedIO.Testing
                 { "random.dat",  _randomDataFile },
                 { "sub", new MockDirectory {
                     { "index.html", StockResource.GetBytes("sub.index.html") },
-                } },
+                    }
+                },
             };
-
         }
 
         /// <inheritdoc />
@@ -94,24 +94,24 @@ namespace EmbedIO.Testing
                 return null;
 
             var path = urlPath.Substring(1);
-            var (name, entry) = FindEntry(path);
+            (var name, MockDirectoryEntry entry) = FindEntry(path);
             return GetResourceInfo(path, name, entry, mimeTypeProvider);
         }
 
         /// <inheritdoc />
         public Stream? OpenFile(string path)
         {
-            var (_, entry) = FindEntry(path);
+            (var _, MockDirectoryEntry entry) = FindEntry(path);
             return entry is MockFile file ? new MemoryStream(file.Data, false) : null;
         }
 
         /// <inheritdoc />
         public IEnumerable<MappedResourceInfo> GetDirectoryEntries(string path, IMimeTypeProvider mimeTypeProvider)
         {
-            var (name, entry) = FindEntry(path);
+            (var name, MockDirectoryEntry entry) = FindEntry(path);
             return entry is MockDirectory directory
                 ? directory.Select(pair => GetResourceInfo(AppendNameToPath(path, name), name, entry, mimeTypeProvider))
-                : Enumerable.Empty<MappedResourceInfo>();
+                :[];
         }
 
         /// <summary>
@@ -149,6 +149,9 @@ namespace EmbedIO.Testing
             return data;
         }
 
+        private static string AppendNameToPath(string path, string name)
+            => string.IsNullOrEmpty(path) ? name : $"{path}/{name}";
+
         private byte[] CreateRandomData(int length)
         {
             var result = new byte[length];
@@ -164,19 +167,19 @@ namespace EmbedIO.Testing
             if (path.Length == 0)
                 return (string.Empty, _root);
 
-            var dir = _root;
+            MockDirectory dir = _root;
             var segments = path.Split('/');
             var lastIndex = segments.Length - 1;
             var i = 0;
             foreach (var segment in segments)
             {
-                if (!dir.TryGetValue(segment, out var entry))
+                if (!dir.TryGetValue(segment, out MockDirectoryEntry? entry))
                     return default;
 
                 if (i == lastIndex && entry is MockFile file)
                     return (segment, file);
 
-                if (!(entry is MockDirectory directory))
+                if (entry is not MockDirectory directory)
                     return default;
 
                 if (i == lastIndex)
@@ -189,13 +192,11 @@ namespace EmbedIO.Testing
             return default;
         }
 
-        private MappedResourceInfo? GetResourceInfo(string path, string name, MockDirectoryEntry entry, IMimeTypeProvider mimeTypeProvider) => entry switch {
+        private MappedResourceInfo? GetResourceInfo(string path, string name, MockDirectoryEntry entry, IMimeTypeProvider mimeTypeProvider) => entry switch
+        {
             MockFile file => MappedResourceInfo.ForFile(path, name, file.LastModifiedUtc, file.Data.Length, mimeTypeProvider.GetMimeType(Path.GetExtension(name))),
             MockDirectory _ => MappedResourceInfo.ForDirectory(string.Empty, name, _root.LastModifiedUtc),
             _ => null
         };
-
-        private static string AppendNameToPath(string path, string name)
-            => string.IsNullOrEmpty(path) ? name : $"{path}/{name}";
     }
 }

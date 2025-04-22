@@ -3,7 +3,6 @@ using System.IO;
 using System.Net;
 using System.Net.Security;
 using System.Net.Sockets;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -36,8 +35,8 @@ namespace EmbedIO.Net.Internal
             _sock = sock;
             _epl = epl;
             IsSecure = epl.Secure;
-            LocalEndPoint = (IPEndPoint) sock.LocalEndPoint;
-            RemoteEndPoint = (IPEndPoint) sock.RemoteEndPoint;
+            LocalEndPoint = (IPEndPoint)sock.LocalEndPoint;
+            RemoteEndPoint = (IPEndPoint)sock.RemoteEndPoint;
 
             Stream = new NetworkStream(sock, false);
             if (IsSecure)
@@ -46,7 +45,7 @@ namespace EmbedIO.Net.Internal
 
                 try
                 {
-                    sslStream.AuthenticateAsServer(epl.Listener.Certificate);
+                    sslStream.AuthenticateAsServer(epl!.Listener.Certificate);
                 }
                 catch
                 {
@@ -66,9 +65,9 @@ namespace EmbedIO.Net.Internal
 
         public Stream Stream { get; }
 
-        public IPEndPoint LocalEndPoint { get; }
+        public IPEndPoint? LocalEndPoint { get; }
 
-        public IPEndPoint RemoteEndPoint { get; }
+        public IPEndPoint? RemoteEndPoint { get; }
 
         public bool IsSecure { get; }
 
@@ -160,7 +159,7 @@ namespace EmbedIO.Net.Internal
                 }
             }
 
-            using (var s = _sock)
+            using (Socket s = _sock)
             {
                 _sock = null;
                 try
@@ -207,7 +206,7 @@ namespace EmbedIO.Net.Internal
             {
                 try
                 {
-                    await _ms.WriteAsync(_buffer, 0, offset).ConfigureAwait(false);
+                    await _ms.WriteAsync(_buffer!, 0, offset).ConfigureAwait(false);
                     if (_ms.Length > 32768)
                     {
                         Close(true);
@@ -241,16 +240,16 @@ namespace EmbedIO.Net.Internal
                         return;
                     }
 
-                    var listener = _context.Listener;
+                    HttpListener? listener = _context.Listener;
                     if (_lastListener != listener)
                     {
                         RemoveConnection();
-                        listener.AddConnection(this);
+                        listener?.AddConnection(this);
                         _lastListener = listener;
                     }
 
                     _contextBound = true;
-                    listener.RegisterContext(_context);
+                    listener?.RegisterContext(_context);
                     return;
                 }
 
@@ -390,7 +389,7 @@ namespace EmbedIO.Net.Internal
                 return;
             }
 
-            _epl.UnbindContext(_context);
+            EndPointListener.UnbindContext(_context);
             _contextBound = false;
         }
 

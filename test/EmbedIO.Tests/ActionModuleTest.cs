@@ -1,8 +1,9 @@
 ﻿using System.Net;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
+
 using EmbedIO.Testing;
+
 using NUnit.Framework;
 
 namespace EmbedIO.Tests
@@ -20,10 +21,10 @@ namespace EmbedIO.Tests
 
             async Task Use(HttpClient client)
             {
-                using var response = await client.GetAsync("/").ConfigureAwait(false);
-                Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+                using HttpResponseMessage response = await client.GetAsync("/").ConfigureAwait(false);
+                NUnit.Framework.Legacy.ClassicAssert.AreEqual(HttpStatusCode.OK, response.StatusCode);
                 var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                Assert.AreEqual(Ok, responseString);
+                NUnit.Framework.Legacy.ClassicAssert.AreEqual(Ok, responseString);
             }
 
             return TestWebServer.UseAsync(Configure, Use);
@@ -37,10 +38,10 @@ namespace EmbedIO.Tests
 
             async Task Use(HttpClient client)
             {
-                using var response = await client.GetAsync("/").ConfigureAwait(false);
-                Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+                using HttpResponseMessage response = await client.GetAsync("/").ConfigureAwait(false);
+                NUnit.Framework.Legacy.ClassicAssert.AreEqual(HttpStatusCode.OK, response.StatusCode);
                 var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                Assert.AreEqual(Ok, responseString);
+                NUnit.Framework.Legacy.ClassicAssert.AreEqual(Ok, responseString);
             }
 
             return TestWebServer.UseAsync(Configure, Use);
@@ -54,10 +55,10 @@ namespace EmbedIO.Tests
 
             async Task Use(HttpClient client)
             {
-                using var response = await client.PostAsync("/", null).ConfigureAwait(false);
-                Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+                using HttpResponseMessage response = await client.PostAsync("/", null).ConfigureAwait(false);
+                NUnit.Framework.Legacy.ClassicAssert.AreEqual(HttpStatusCode.OK, response.StatusCode);
                 var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                Assert.AreEqual(Ok, responseString);
+                NUnit.Framework.Legacy.ClassicAssert.AreEqual(Ok, responseString);
             }
 
             return TestWebServer.UseAsync(Configure, Use);
@@ -71,10 +72,10 @@ namespace EmbedIO.Tests
 
             async Task Use(HttpClient client)
             {
-                using var response = await client.PutAsync("/", null).ConfigureAwait(false);
-                Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+                using HttpResponseMessage response = await client.PutAsync("/", null).ConfigureAwait(false);
+                NUnit.Framework.Legacy.ClassicAssert.AreEqual(HttpStatusCode.OK, response.StatusCode);
                 var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                Assert.AreEqual(Ok, responseString);
+                NUnit.Framework.Legacy.ClassicAssert.AreEqual(Ok, responseString);
             }
 
             return TestWebServer.UseAsync(Configure, Use);
@@ -88,10 +89,10 @@ namespace EmbedIO.Tests
 
             async Task Use(HttpClient client)
             {
-                using var response = await client.HeadAsync("/").ConfigureAwait(false);
-                Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+                using HttpResponseMessage response = await client.HeadAsync("/").ConfigureAwait(false);
+                NUnit.Framework.Legacy.ClassicAssert.AreEqual(HttpStatusCode.OK, response.StatusCode);
                 var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                Assert.AreEqual(Ok, responseString);
+                NUnit.Framework.Legacy.ClassicAssert.AreEqual(Ok, responseString);
             }
 
             return TestWebServer.UseAsync(Configure, Use);
@@ -105,10 +106,10 @@ namespace EmbedIO.Tests
 
             async Task Use(HttpClient client)
             {
-                using var response = await client.DeleteAsync("/").ConfigureAwait(false);
-                Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+                using HttpResponseMessage response = await client.DeleteAsync("/").ConfigureAwait(false);
+                NUnit.Framework.Legacy.ClassicAssert.AreEqual(HttpStatusCode.OK, response.StatusCode);
                 var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                Assert.AreEqual(Ok, responseString);
+                NUnit.Framework.Legacy.ClassicAssert.AreEqual(Ok, responseString);
             }
 
             return TestWebServer.UseAsync(Configure, Use);
@@ -118,14 +119,14 @@ namespace EmbedIO.Tests
         public Task OnOptions_ResponseOK()
         {
             void Configure(IWebServer server) => server
-                .OnOptions(ctx=> ctx.SendStringAsync(Ok, MimeType.PlainText, WebServer.DefaultEncoding));
+                .OnOptions(ctx => ctx.SendStringAsync(Ok, MimeType.PlainText, WebServer.DefaultEncoding));
 
             async Task Use(HttpClient client)
             {
-                using var response = await client.OptionsAsync("/").ConfigureAwait(false);
-                Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+                using HttpResponseMessage response = await client.OptionsAsync("/").ConfigureAwait(false);
+                NUnit.Framework.Legacy.ClassicAssert.AreEqual(HttpStatusCode.OK, response.StatusCode);
                 var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                Assert.AreEqual(Ok, responseString);
+                NUnit.Framework.Legacy.ClassicAssert.AreEqual(Ok, responseString);
             }
 
             return TestWebServer.UseAsync(Configure, Use);
@@ -139,10 +140,10 @@ namespace EmbedIO.Tests
 
             async Task Use(HttpClient client)
             {
-                using var response = await client.PatchAsync("/", null).ConfigureAwait(false);
-                Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+                using HttpResponseMessage response = await client.PatchAsync("/", null).ConfigureAwait(false);
+                NUnit.Framework.Legacy.ClassicAssert.AreEqual(HttpStatusCode.OK, response.StatusCode);
                 var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                Assert.AreEqual(Ok, responseString);
+                NUnit.Framework.Legacy.ClassicAssert.AreEqual(Ok, responseString);
             }
 
             return TestWebServer.UseAsync(Configure, Use);

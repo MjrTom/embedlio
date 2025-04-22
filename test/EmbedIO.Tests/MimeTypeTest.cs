@@ -19,7 +19,7 @@ namespace EmbedIO.Tests
         [TestCase("text/html", true)]
         public void IsMimeType_ReturnsCorrectValue(string mimeType, bool isMimeType)
         {
-            Assert.AreEqual(isMimeType, MimeType.IsMimeType(mimeType, false));
+            NUnit.Framework.Legacy.ClassicAssert.AreEqual(isMimeType, MimeType.IsMimeType(mimeType, false));
         }
 
         [TestCase(null, false)]
@@ -36,7 +36,7 @@ namespace EmbedIO.Tests
         [TestCase("text/html", true)]
         public void IsMimeTypeOrMediaRange_ReturnsCorrectValue(string mimeType, bool isMimeTypeOrMediaRange)
         {
-            Assert.AreEqual(isMimeTypeOrMediaRange, MimeType.IsMimeType(mimeType, true));
+            NUnit.Framework.Legacy.ClassicAssert.AreEqual(isMimeTypeOrMediaRange, MimeType.IsMimeType(mimeType, true));
         }
     }
 }

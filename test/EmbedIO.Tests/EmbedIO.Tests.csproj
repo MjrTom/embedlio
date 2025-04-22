@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net8.0;netstandard2.0</TargetFrameworks>
+    <TargetFramework>net8.0</TargetFramework>
     <TestProjectType>UnitTest</TestProjectType>
     <RepositoryUrl>https://github.com/MjrTom/embedlio/</RepositoryUrl>
   </PropertyGroup>

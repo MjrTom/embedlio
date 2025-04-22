@@ -16,7 +16,7 @@ namespace EmbedIO.Tests.Issues
             using var server2 = new WebServer(ConfigureServerOptions);
             server1.Start();
             server2.Start();
-            Assert.AreEqual(WebServerState.Stopped, server2.State);
+            NUnit.Framework.Legacy.ClassicAssert.AreEqual(WebServerState.Stopped, server2.State);
         }
     }
 }

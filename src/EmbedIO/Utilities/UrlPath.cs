@@ -14,7 +14,7 @@ namespace EmbedIO.Utilities
         /// </summary>
         public const string Root = "/";
 
-        private static readonly Regex MultipleSlashRegex = new Regex("//+", RegexOptions.Compiled | RegexOptions.CultureInvariant);
+        private static readonly Regex MultipleSlashRegex = new("//+", RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
         /// <summary>
         /// Determines whether a string is a valid URL path.
@@ -61,7 +61,7 @@ namespace EmbedIO.Utilities
         /// <seealso cref="Validate.UrlPath"/>
         public static string Normalize(string urlPath, bool isBasePath)
         {
-            var exception = ValidateInternal(nameof(urlPath), urlPath);
+            Exception? exception = ValidateInternal(nameof(urlPath), urlPath);
             if (exception != null)
                 throw exception;
 
@@ -143,7 +143,7 @@ namespace EmbedIO.Utilities
         /// <seealso cref="Validate.UrlPath"/>
         public static bool HasPrefix(string urlPath, string baseUrlPath)
             => UnsafeHasPrefix(
-                Validate.UrlPath(nameof(urlPath), urlPath, false), 
+                Validate.UrlPath(nameof(urlPath), urlPath, false),
                 Validate.UrlPath(nameof(baseUrlPath), baseUrlPath, true));
 
         /// <summary>

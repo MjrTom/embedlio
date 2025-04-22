@@ -4,7 +4,7 @@ using EmbedIO.Utilities;
 
 namespace EmbedIO
 {
-    partial class HttpContextExtensions
+    static partial class HttpContextExtensions
     {
         /// <summary>
         /// Sets a redirection status code and adds a <c>Location</c> header to the response.
@@ -23,7 +23,7 @@ namespace EmbedIO
         {
             location = Validate.Url(nameof(location), location, @this.Request.Url);
 
-            if (statusCode < 300 || statusCode > 399)
+            if (statusCode is < 300 or > 399)
                 throw new ArgumentException("Redirect status code is not valid.", nameof(statusCode));
 
             @this.Response.SetEmptyResponse(statusCode);

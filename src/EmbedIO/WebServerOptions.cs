@@ -19,7 +19,7 @@ namespace EmbedIO
     {
         private const string NetShLogSource = "NetSh";
 
-        private readonly List<string> _urlPrefixes = new List<string>();
+        private readonly List<string> _urlPrefixes = new();
 
         private HttpListenerMode _mode = HttpListenerMode.EmbedIO;
 
@@ -196,28 +196,31 @@ namespace EmbedIO
             if (SwanRuntime.OS != Swan.OperatingSystem.Windows)
                 return null;
 
-            if (!string.IsNullOrWhiteSpace(_certificateThumbprint)) return GetCertificate(_certificateThumbprint);
+            if (!string.IsNullOrWhiteSpace(_certificateThumbprint))
+                return GetCertificate(_certificateThumbprint);
 
-            using var netsh = GetNetsh("show");
+            using Process netsh = GetNetsh("show");
 
             string? thumbprint = null;
 
             netsh.ErrorDataReceived += (s, e) =>
             {
-                if (string.IsNullOrWhiteSpace(e.Data)) return;
+                if (string.IsNullOrWhiteSpace(e.Data))
+                    return;
 
                 e.Data.Error(NetShLogSource);
             };
 
             netsh.OutputDataReceived += (s, e) =>
             {
-                if (string.IsNullOrWhiteSpace(e.Data)) return;
+                if (string.IsNullOrWhiteSpace(e.Data))
+                    return;
 
                 e.Data.Debug(NetShLogSource);
 
                 var line = e.Data.Trim();
 
-                if (line.StartsWith("Certificate Hash") && line.IndexOf(":", StringComparison.Ordinal) > -1)
+                if (line.StartsWith("Certificate Hash") && line.IndexOf(':') > -1)
                     thumbprint = line.Split(':')[1].Trim();
             };
 
@@ -237,9 +240,9 @@ namespace EmbedIO
         {
             using var store = new X509Store(StoreName, StoreLocation);
             store.Open(OpenFlags.ReadOnly);
-            var signingCert = store.Certificates.Find(
+            X509Certificate2Collection signingCert = store.Certificates.Find(
                 X509FindType.FindByThumbprint,
-                thumbprint ?? _certificateThumbprint, 
+                thumbprint! ?? _certificateThumbprint,
                 false);
             return signingCert.Count == 0 ? null : signingCert[0];
         }
@@ -250,7 +253,7 @@ namespace EmbedIO
             try
             {
                 store.Open(OpenFlags.ReadWrite);
-                store.Add(_certificate);
+                store.Add(_certificate!);
                 return true;
             }
             catch
@@ -273,13 +276,14 @@ namespace EmbedIO
                     "The provided certificate cannot be added to the default store, add it manually");
             }
 
-            using var netsh = GetNetsh("add", $"certhash={_certificate.Thumbprint} appid={{adaa04bb-8b63-4073-a12f-d6f8c0b4383f}}");
+            using Process netsh = GetNetsh("add", $"certhash={_certificate.Thumbprint} appid={{adaa04bb-8b63-4073-a12f-d6f8c0b4383f}}");
 
             var sb = new StringBuilder();
 
             void PushLine(object sender, DataReceivedEventArgs e)
             {
-                if (string.IsNullOrWhiteSpace(e.Data)) return;
+                if (string.IsNullOrWhiteSpace(e.Data))
+                    return;
 
                 sb.AppendLine(e.Data);
                 e.Data.Error(NetShLogSource);
@@ -289,7 +293,8 @@ namespace EmbedIO
 
             netsh.ErrorDataReceived += PushLine;
 
-            if (!netsh.Start()) return false;
+            if (!netsh.Start())
+                return false;
 
             netsh.BeginOutputReadLine();
             netsh.BeginErrorReadLine();
@@ -305,7 +310,7 @@ namespace EmbedIO
             foreach (var url in UrlPrefixes.Where(x =>
                 x.StartsWith("https:", StringComparison.OrdinalIgnoreCase)))
             {
-                var match = Regex.Match(url, @":(\d+)");
+                Match match = Regex.Match(url, @":(\d+)");
 
                 if (match.Success && int.TryParse(match.Groups[1].Value, out port))
                     break;
@@ -314,7 +319,7 @@ namespace EmbedIO
             return port;
         }
 
-        private Process GetNetsh(string verb, string options = "") => new Process
+        private Process GetNetsh(string verb, string options = "") => new()
         {
             StartInfo = new ProcessStartInfo
             {

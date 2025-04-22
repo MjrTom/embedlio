@@ -1,11 +1,11 @@
 ﻿using System.IO;
 using System.IO.Compression;
-using System.Text;
+
 using Swan.Logging;
 
 namespace EmbedIO
 {
-    partial class HttpContextExtensions
+    static partial class HttpContextExtensions
     {
         /// <summary>
         /// <para>Wraps the request input stream and returns a <see cref="Stream"/> that can be used directly.</para>
@@ -20,7 +20,7 @@ namespace EmbedIO
         /// <seealso cref="WebServerOptionsBase.SupportCompressedRequests"/>
         public static Stream OpenRequestStream(this IHttpContext @this)
         {
-            var stream = @this.Request.InputStream;
+            Stream stream = @this.Request.InputStream;
 
             var encoding = @this.Request.Headers[HttpHeaderNames.ContentEncoding]?.Trim();
             switch (encoding)

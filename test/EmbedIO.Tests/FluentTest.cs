@@ -1,6 +1,8 @@
 ﻿using EmbedIO.Files;
 using EmbedIO.Tests.TestObjects;
+
 using NUnit.Framework;
+
 using System;
 using System.Linq;
 
@@ -25,12 +27,12 @@ namespace EmbedIO.Tests
         [Test]
         public void FluentWithStaticFolder()
         {
-            var webServer = new WebServer(_webServerUrl)
+            WebServer webServer = new WebServer(_webServerUrl)
                 .WithLocalSessionManager()
                 .WithStaticFolder("/", _rootPath, true);
 
-            Assert.AreEqual(webServer.Modules.Count, 1, "It has 1 modules loaded");
-            Assert.IsNotNull(webServer.Modules.OfType<FileModule>().FirstOrDefault(), $"It has {nameof(FileModule)}");
+            NUnit.Framework.Legacy.ClassicAssert.AreEqual(webServer.Modules.Count, 1, "It has 1 modules loaded");
+            NUnit.Framework.Legacy.ClassicAssert.IsNotNull(webServer.Modules.OfType<FileModule>().FirstOrDefault(), $"It has {nameof(FileModule)}");
         }
 
         [Test]
@@ -51,7 +53,7 @@ namespace EmbedIO.Tests
         {
             Assert.Throws<ArgumentNullException>(() => _nullWebServer.WithWebApi("/", null));
         }
-        
+
         [Test]
         public void FluentWithCorsArgumentException()
         {

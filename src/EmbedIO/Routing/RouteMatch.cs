@@ -121,7 +121,7 @@ namespace EmbedIO.Routing
         /// or <see cref="UrlPath.IsValid"/>.</para>
         /// </remarks>
         public static RouteMatch UnsafeFromRoot(string urlPath)
-            => new RouteMatch(urlPath, EmptyStringList, EmptyStringList, urlPath);
+            => new(urlPath, EmptyStringList, EmptyStringList, urlPath);
 
         /// <summary>
         /// Returns a <see cref="RouteMatch"/> object equal to the one

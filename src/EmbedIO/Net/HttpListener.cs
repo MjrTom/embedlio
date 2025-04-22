@@ -17,7 +17,7 @@ namespace EmbedIO.Net
     /// <seealso cref="IDisposable" />
     public sealed class HttpListener : IHttpListener
     {
-        private readonly SemaphoreSlim _ctxQueueSem = new (0);
+        private readonly SemaphoreSlim _ctxQueueSem = new(0);
         private readonly ConcurrentDictionary<string, HttpListenerContext> _ctxQueue;
         private readonly ConcurrentDictionary<HttpConnection, object> _connections;
         private readonly HttpListenerPrefixCollection _prefixes;
@@ -35,7 +35,7 @@ namespace EmbedIO.Net
             _connections = new ConcurrentDictionary<HttpConnection, object>();
             _ctxQueue = new ConcurrentDictionary<string, HttpListenerContext>();
         }
-        
+
         /// <inheritdoc />
         public bool IgnoreWriteExceptions { get; set; } = true;
 
@@ -47,7 +47,7 @@ namespace EmbedIO.Net
 
         /// <inheritdoc />
         public List<string> Prefixes => _prefixes.ToList();
-        
+
         /// <summary>
         /// Gets the certificate.
         /// </summary>
@@ -100,7 +100,7 @@ namespace EmbedIO.Net
 
                 foreach (var key in _ctxQueue.Keys)
                 {
-                    if (_ctxQueue.TryRemove(key, out var context))
+                    if (_ctxQueue.TryRemove(key, out HttpListenerContext? context))
                     {
                         return context;
                     }
@@ -130,7 +130,7 @@ namespace EmbedIO.Net
         {
             EndPointManager.RemoveListener(this);
 
-            var keys = _connections.Keys;
+            ICollection<HttpConnection> keys = _connections.Keys;
             var connections = new HttpConnection[keys.Count];
             keys.CopyTo(connections, 0);
             _connections.Clear();
@@ -150,7 +150,7 @@ namespace EmbedIO.Net
             {
                 foreach (var key in _ctxQueue.Keys.ToArray())
                 {
-                    if (_ctxQueue.TryGetValue(key, out var context))
+                    if (_ctxQueue.TryGetValue(key, out HttpListenerContext? context))
                     {
                         context.Connection.Close(true);
                     }

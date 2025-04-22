@@ -50,7 +50,7 @@ namespace EmbedIO
         /// <summary>
         /// Gets a value indicating whether this instance has entity body.
         /// </summary>
-        bool HasEntityBody { get;  }
+        bool HasEntityBody { get; }
 
         /// <summary>
         /// Gets the input stream.

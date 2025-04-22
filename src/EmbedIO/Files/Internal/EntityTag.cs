@@ -7,7 +7,7 @@ namespace EmbedIO.Files.Internal
     {
         public static string Compute(DateTime lastModifiedUtc, long length, CompressionMethod compressionMethod)
         {
-            var sb = new StringBuilder()
+            StringBuilder sb = new StringBuilder()
                 .Append('"')
                 .Append(Base64Utility.LongToBase64(lastModifiedUtc.Ticks))
                 .Append(Base64Utility.LongToBase64(length));

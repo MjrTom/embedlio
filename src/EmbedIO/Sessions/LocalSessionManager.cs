@@ -45,7 +45,7 @@ namespace EmbedIO.Sessions
         public static readonly TimeSpan DefaultPurgeInterval = TimeSpan.FromSeconds(30);
 
         private readonly ConcurrentDictionary<string, SessionImpl> _sessions =
-            new ConcurrentDictionary<string, SessionImpl>(Session.KeyComparer);
+            new(Session.KeyComparer);
 
         private string _cookieName = DefaultCookieName;
 
@@ -229,7 +229,7 @@ namespace EmbedIO.Sessions
         {
             lock (_sessions)
             {
-                if (_sessions.TryGetValue(id, out var session))
+                if (_sessions.TryGetValue(id, out SessionImpl? session))
                     session.EndUse(() => _sessions.TryRemove(id, out _));
             }
 
@@ -246,7 +246,7 @@ namespace EmbedIO.Sessions
             var id = context.Session.Id;
             lock (_sessions)
             {
-                if (_sessions.TryGetValue(id, out var session))
+                if (_sessions.TryGetValue(id, out SessionImpl? session))
                 {
                     session.EndUse(() => _sessions.TryRemove(id, out _));
                 }
@@ -290,7 +290,7 @@ namespace EmbedIO.Sessions
             {
                 lock (_sessions)
                 {
-                    if (!_sessions.TryGetValue(id, out var session))
+                    if (!_sessions.TryGetValue(id, out SessionImpl? session))
                         return;
 
                     session.UnregisterIfNeeded(() => _sessions.TryRemove(id, out _));

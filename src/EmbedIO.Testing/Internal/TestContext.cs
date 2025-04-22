@@ -16,9 +16,9 @@ namespace EmbedIO.Testing.Internal
 {
     internal sealed class TestContext : IHttpContextImpl
     {
-        private readonly TimeKeeper _ageKeeper = new TimeKeeper();
+        private readonly TimeKeeper _ageKeeper = new();
 
-        private readonly Stack<Action<IHttpContext>> _closeCallbacks = new Stack<Action<IHttpContext>>();
+        private readonly Stack<Action<IHttpContext>> _closeCallbacks = new();
 
         private bool _closed;
 
@@ -90,7 +90,7 @@ namespace EmbedIO.Testing.Internal
             // Always close the response stream no matter what.
             Response.Close();
 
-            foreach (var callback in _closeCallbacks)
+            foreach (Action<IHttpContext> callback in _closeCallbacks)
             {
                 try
                 {

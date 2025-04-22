@@ -37,22 +37,22 @@ namespace EmbedIO.Tests
             {
                 var request = new HttpRequestMessage(HttpMethod.Get, UrlPath.Root);
 
-                using (var response = await Client.SendAsync(request))
+                using (HttpResponseMessage response = await Client.SendAsync(request))
                 {
-                    Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "Status Code OK");
+                    NUnit.Framework.Legacy.ClassicAssert.AreEqual(HttpStatusCode.OK, response.StatusCode, "Status Code OK");
 
                     var html = await response.Content.ReadAsStringAsync();
 
-                    Assert.AreEqual(Resources.Index, html, "Same content index.html");
+                    NUnit.Framework.Legacy.ClassicAssert.AreEqual(Resources.Index, html, "Same content index.html");
 
-                    Assert.IsTrue(string.IsNullOrWhiteSpace(response.Headers.Pragma.ToString()), "Pragma empty");
+                    NUnit.Framework.Legacy.ClassicAssert.IsTrue(string.IsNullOrWhiteSpace(response.Headers.Pragma.ToString()), "Pragma empty");
                 }
 
                 request = new HttpRequestMessage(HttpMethod.Get, UrlPath.Root);
 
-                using (var response = await Client.SendAsync(request))
+                using (HttpResponseMessage response = await Client.SendAsync(request))
                 {
-                    Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "Status Code OK");
+                    NUnit.Framework.Legacy.ClassicAssert.AreEqual(HttpStatusCode.OK, response.StatusCode, "Status Code OK");
                 }
             }
 
@@ -61,7 +61,7 @@ namespace EmbedIO.Tests
             public async Task SubFolderIndex(string url)
             {
                 var html = await Client.GetStringAsync(url);
-                Assert.AreEqual(Resources.SubIndex, html, $"Same content {url}");
+                NUnit.Framework.Legacy.ClassicAssert.AreEqual(Resources.SubIndex, html, $"Same content {url}");
             }
 
             [Test]
@@ -69,12 +69,12 @@ namespace EmbedIO.Tests
             {
                 var request = new HttpRequestMessage(HttpMethod.Head, UrlPath.Root);
 
-                using var response = await Client.SendAsync(request);
-                Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "Status Code OK");
+                using HttpResponseMessage response = await Client.SendAsync(request);
+                NUnit.Framework.Legacy.ClassicAssert.AreEqual(HttpStatusCode.OK, response.StatusCode, "Status Code OK");
 
                 var html = await response.Content.ReadAsStringAsync();
 
-                Assert.IsEmpty(html, "Content Empty");
+                NUnit.Framework.Legacy.ClassicAssert.IsEmpty(html, "Content Empty");
             }
 
             [Test]
@@ -98,8 +98,8 @@ namespace EmbedIO.Tests
                 var remoteUpdatedFile = await server.Client.GetStringAsync(UrlPath.Root);
                 File.WriteAllText(file, nameof(WebServer));
 
-                Assert.AreEqual(Resources.Index, remoteFile);
-                Assert.AreEqual(Resources.SubIndex, remoteUpdatedFile);
+                NUnit.Framework.Legacy.ClassicAssert.AreEqual(Resources.Index, remoteFile);
+                NUnit.Framework.Legacy.ClassicAssert.AreEqual(Resources.SubIndex, remoteUpdatedFile);
             }
 
             [Test]
@@ -108,7 +108,7 @@ namespace EmbedIO.Tests
                 var file = Path.GetTempPath() + Guid.NewGuid().ToString().ToLower();
                 File.WriteAllText(file, string.Empty);
 
-                Assert.IsTrue(File.Exists(file), "File was created");
+                NUnit.Framework.Legacy.ClassicAssert.IsTrue(File.Exists(file), "File was created");
 
                 if (File.Exists(file.ToUpper()))
                 {
@@ -116,10 +116,10 @@ namespace EmbedIO.Tests
                 }
 
                 var htmlUpperCase = await Client.GetStringAsync(StaticFolder.WithDataFiles.UppercaseFile);
-                Assert.AreEqual(nameof(StaticFolder.WithDataFiles.UppercaseFile), htmlUpperCase, "Same content upper case");
+                NUnit.Framework.Legacy.ClassicAssert.AreEqual(nameof(StaticFolder.WithDataFiles.UppercaseFile), htmlUpperCase, "Same content upper case");
 
                 var htmlLowerCase = await Client.GetStringAsync(StaticFolder.WithDataFiles.LowercaseFile);
-                Assert.AreEqual(nameof(StaticFolder.WithDataFiles.LowercaseFile), htmlLowerCase, "Same content lower case");
+                NUnit.Framework.Legacy.ClassicAssert.AreEqual(nameof(StaticFolder.WithDataFiles.LowercaseFile), htmlLowerCase, "Same content lower case");
             }
         }
 
@@ -133,14 +133,14 @@ namespace EmbedIO.Tests
                 var request = new HttpRequestMessage(HttpMethod.Get, StaticFolder.WithDataFiles.BigDataFile);
                 request.Headers.Range = new RangeHeaderValue(offset, offset + length - 1);
 
-                using var response = await Client.SendAsync(request);
-                Assert.AreEqual(HttpStatusCode.PartialContent, response.StatusCode, "Responds with 216 Partial Content");
+                using HttpResponseMessage response = await Client.SendAsync(request);
+                NUnit.Framework.Legacy.ClassicAssert.AreEqual(HttpStatusCode.PartialContent, response.StatusCode, "Responds with 216 Partial Content");
 
                 await using var ms = new MemoryStream();
-                var responseStream = await response.Content.ReadAsStreamAsync();
+                Stream responseStream = await response.Content.ReadAsStreamAsync();
                 responseStream.CopyTo(ms);
                 var data = ms.ToArray();
-                Assert.IsTrue(ServedFolder.BigData.Skip(offset).Take(length).SequenceEqual(data), message);
+                NUnit.Framework.Legacy.ClassicAssert.IsTrue(ServedFolder.BigData.Skip(offset).Take(length).SequenceEqual(data), message);
             }
 
             [Test]
@@ -148,13 +148,13 @@ namespace EmbedIO.Tests
             {
                 var request = new HttpRequestMessage(HttpMethod.Get, StaticFolder.WithDataFiles.BigDataFile);
 
-                using var response = await Client.SendAsync(request);
-                Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "Status Code OK");
+                using HttpResponseMessage response = await Client.SendAsync(request);
+                NUnit.Framework.Legacy.ClassicAssert.AreEqual(HttpStatusCode.OK, response.StatusCode, "Status Code OK");
 
                 var data = await response.Content.ReadAsByteArrayAsync();
 
-                Assert.IsNotNull(data, "Data is not empty");
-                Assert.IsTrue(ServedFolder.BigData.SequenceEqual(data));
+                NUnit.Framework.Legacy.ClassicAssert.IsNotNull(data, "Data is not empty");
+                NUnit.Framework.Legacy.ClassicAssert.IsTrue(ServedFolder.BigData.SequenceEqual(data));
             }
 
             [Test]
@@ -163,12 +163,12 @@ namespace EmbedIO.Tests
                 var requestHead = new HttpRequestMessage(HttpMethod.Get, StaticFolder.WithDataFiles.BigDataFile);
 
                 int remoteSize;
-                using (var res = await Client.SendAsync(requestHead))
+                using (HttpResponseMessage res = await Client.SendAsync(requestHead))
                 {
                     remoteSize = (await res.Content.ReadAsByteArrayAsync()).Length;
                 }
 
-                Assert.AreEqual(StaticFolder.WithDataFiles.BigDataSize, remoteSize);
+                NUnit.Framework.Legacy.ClassicAssert.AreEqual(StaticFolder.WithDataFiles.BigDataSize, remoteSize);
 
                 var buffer = new byte[remoteSize];
                 const int chunkSize = 100000;
@@ -179,16 +179,16 @@ namespace EmbedIO.Tests
 
                     request.Headers.Range = new RangeHeaderValue(offset, top);
 
-                    using var response = await Client.SendAsync(request);
-                    Assert.AreEqual(HttpStatusCode.PartialContent, response.StatusCode);
+                    using HttpResponseMessage response = await Client.SendAsync(request);
+                    NUnit.Framework.Legacy.ClassicAssert.AreEqual(HttpStatusCode.PartialContent, response.StatusCode);
 
                     await using var ms = new MemoryStream();
-                    var stream = await response.Content.ReadAsStreamAsync();
+                    Stream stream = await response.Content.ReadAsStreamAsync();
                     stream.CopyTo(ms);
                     Buffer.BlockCopy(ms.GetBuffer(), 0, buffer, offset, (int)ms.Length);
                 }
 
-                Assert.IsTrue(ServedFolder.BigData.SequenceEqual(buffer));
+                NUnit.Framework.Legacy.ClassicAssert.IsTrue(ServedFolder.BigData.SequenceEqual(buffer));
             }
 
             [Test]
@@ -201,9 +201,9 @@ namespace EmbedIO.Tests
                 var request = new HttpRequestMessage(HttpMethod.Get, WebServerUrl + StaticFolder.WithDataFiles.BigDataFile);
                 request.Headers.Range = new RangeHeaderValue(0, StaticFolder.WithDataFiles.BigDataSize + 10);
 
-                using var response = await Client.SendAsync(request);
-                Assert.AreEqual(HttpStatusCode.RequestedRangeNotSatisfiable, response.StatusCode);
-                Assert.AreEqual(StaticFolder.WithDataFiles.BigDataSize, response.Content.Headers.ContentRange.Length);
+                using HttpResponseMessage response = await Client.SendAsync(request);
+                NUnit.Framework.Legacy.ClassicAssert.AreEqual(HttpStatusCode.RequestedRangeNotSatisfiable, response.StatusCode);
+                NUnit.Framework.Legacy.ClassicAssert.AreEqual(StaticFolder.WithDataFiles.BigDataSize, response.Content.Headers.ContentRange.Length);
             }
         }
 
@@ -215,13 +215,13 @@ namespace EmbedIO.Tests
                 var request = new HttpRequestMessage(HttpMethod.Get, UrlPath.Root);
                 request.Headers.AcceptEncoding.Clear();
                 byte[] compressedBytes;
-                using (var response = await Client.SendAsync(request))
+                using (HttpResponseMessage response = await Client.SendAsync(request))
                 {
-                    Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "Status Code OK");
+                    NUnit.Framework.Legacy.ClassicAssert.AreEqual(HttpStatusCode.OK, response.StatusCode, "Status Code OK");
                     await using var memoryStream = new MemoryStream();
                     await using (var compressor = new GZipStream(memoryStream, CompressionMode.Compress))
                     {
-                        await using var responseStream = await response.Content.ReadAsStreamAsync();
+                        await using Stream responseStream = await response.Content.ReadAsStreamAsync();
                         responseStream.CopyTo(compressor);
                     }
 
@@ -232,13 +232,13 @@ namespace EmbedIO.Tests
                 request.Headers.AcceptEncoding.Clear();
                 request.Headers.AcceptEncoding.Add(new StringWithQualityHeaderValue(CompressionMethodNames.Gzip));
                 byte[] compressedResponseBytes;
-                using (var response = await Client.SendAsync(request))
+                using (HttpResponseMessage response = await Client.SendAsync(request))
                 {
-                    Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "Status Code OK");
+                    NUnit.Framework.Legacy.ClassicAssert.AreEqual(HttpStatusCode.OK, response.StatusCode, "Status Code OK");
                     compressedResponseBytes = await response.Content.ReadAsByteArrayAsync();
                 }
 
-                Assert.IsTrue(compressedResponseBytes.SequenceEqual(compressedBytes));
+                NUnit.Framework.Legacy.ClassicAssert.IsTrue(compressedResponseBytes.SequenceEqual(compressedBytes));
             }
         }
 
@@ -250,21 +250,21 @@ namespace EmbedIO.Tests
                 var request = new HttpRequestMessage(HttpMethod.Get, WebServerUrl);
                 string entityTag;
 
-                using (var response = await Client.SendAsync(request))
+                using (HttpResponseMessage response = await Client.SendAsync(request))
                 {
-                    Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "Status Code OK");
+                    NUnit.Framework.Legacy.ClassicAssert.AreEqual(HttpStatusCode.OK, response.StatusCode, "Status Code OK");
 
                     // Can't use response.Headers.Etag, it's always null
-                    Assert.NotNull(response.Headers.FirstOrDefault(x => x.Key == "ETag"), "ETag is not null");
+                    NUnit.Framework.Legacy.ClassicAssert.NotNull(response.Headers.FirstOrDefault(x => x.Key == "ETag"), "ETag is not null");
                     entityTag = response.Headers.First(x => x.Key == "ETag").Value.First();
                 }
 
                 var secondRequest = new HttpRequestMessage(HttpMethod.Get, WebServerUrl);
                 secondRequest.Headers.TryAddWithoutValidation(HttpHeaderNames.IfNoneMatch, entityTag);
 
-                using (var response = await Client.SendAsync(secondRequest))
+                using (HttpResponseMessage response = await Client.SendAsync(secondRequest))
                 {
-                    Assert.AreEqual(HttpStatusCode.NotModified, response.StatusCode, "Status Code NotModified");
+                    NUnit.Framework.Legacy.ClassicAssert.AreEqual(HttpStatusCode.NotModified, response.StatusCode, "Status Code NotModified");
                 }
             }
         }

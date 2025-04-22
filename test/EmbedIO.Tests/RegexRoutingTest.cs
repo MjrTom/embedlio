@@ -19,7 +19,7 @@ namespace EmbedIO.Tests
             {
                 var call = await Client.GetStringAsync("empty");
 
-                Assert.AreEqual(string.Empty, call);
+                NUnit.Framework.Legacy.ClassicAssert.AreEqual(string.Empty, call);
             }
 
             [Test]
@@ -27,7 +27,7 @@ namespace EmbedIO.Tests
             {
                 var call = await Client.GetStringAsync("data/1");
 
-                Assert.AreEqual("1", call);
+                NUnit.Framework.Legacy.ClassicAssert.AreEqual("1", call);
             }
 
             [Test]
@@ -35,7 +35,7 @@ namespace EmbedIO.Tests
             {
                 var call = await Client.GetStringAsync("data/1/2");
 
-                Assert.AreEqual("2", call);
+                NUnit.Framework.Legacy.ClassicAssert.AreEqual("2", call);
             }
         }
     }

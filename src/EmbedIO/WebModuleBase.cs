@@ -27,7 +27,7 @@ namespace EmbedIO
     public abstract class WebModuleBase : ConfiguredObject, IWebModule
     {
         private readonly RouteMatcher _routeMatcher;
-        
+
         private ExceptionHandlerCallback? _onUnhandledException;
         private HttpExceptionHandlerCallback? _onHttpException;
 
@@ -75,7 +75,7 @@ namespace EmbedIO
 
         /// <inheritdoc />
         public abstract bool IsFinalHandler { get; }
-        
+
         /// <summary>
         /// Gets a string to use as a source for log messages.
         /// </summary>
@@ -92,12 +92,12 @@ namespace EmbedIO
         }
 
         /// <inheritdoc />
-        public RouteMatch? MatchUrlPath(string urlPath) => _routeMatcher.Match(urlPath);
+        public RouteMatch? MatchUrlPath(string urlPath) => _routeMatcher?.Match(urlPath);
 
         /// <inheritdoc />
         public async Task HandleRequestAsync(IHttpContext context)
         {
-            var contextImpl = context.GetImplementation();
+            IHttpContextImpl? contextImpl = context.GetImplementation();
             var mimeTypeProvider = this as IMimeTypeProvider;
             if (mimeTypeProvider != null)
                 contextImpl?.MimeTypeProviders.Push(mimeTypeProvider);

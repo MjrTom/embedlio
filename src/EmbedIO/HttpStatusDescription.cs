@@ -22,7 +22,7 @@ namespace EmbedIO
     /// </summary>
     public static class HttpStatusDescription
     {
-        private static readonly IReadOnlyDictionary<int, string> Dictionary = new Dictionary<int, string> {
+        private static readonly IReadOnlyDictionary<int, string> Dictionary = new Dictionary<int, string>() {
             { 100, "Continue" },
             { 101, "Switching Protocols" },
             { 102, "Processing" },
@@ -98,7 +98,7 @@ namespace EmbedIO
         /// otherwise, <see langword="false"/>.</returns>
         /// <seealso cref="TryGet(int,out string)"/>
         /// <seealso cref="Get(HttpStatusCode)"/>
-        public static bool TryGet(HttpStatusCode code, out string description) => Dictionary.TryGetValue((int)code, out description);
+        public static bool TryGet(HttpStatusCode code, out string description) => Dictionary.TryGetValue((int)code, out description!);
 
         /// <summary>
         /// Attempts to get the standard status description for a HTTP status code
@@ -114,7 +114,7 @@ namespace EmbedIO
         /// otherwise, <see langword="false"/>.</returns>
         /// <seealso cref="TryGet(HttpStatusCode,out string)"/>
         /// <seealso cref="Get(int)"/>
-        public static bool TryGet(int code, out string description) => Dictionary.TryGetValue(code, out description);
+        public static bool TryGet(int code, out string description) => Dictionary.TryGetValue(code, out description!);
 
         /// <summary>
         /// Returns the standard status description for a <see cref="HttpStatusCode"/>.
@@ -137,7 +137,7 @@ namespace EmbedIO
         /// is to be retrieved.</param>
         /// <returns>The standard HTTP status description for the specified <paramref name="code"/>
         /// if it was found, or <see langword="null"/> if it was not found.</returns>
-        public static string Get(int code)
+        public static string? Get(int code)
         {
             Dictionary.TryGetValue(code, out var description);
             return description;

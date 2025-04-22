@@ -9,14 +9,9 @@ namespace EmbedIO.Net.Internal
     /// <summary>
     /// Represents a wrapper for Microsoft HTTP Listener.
     /// </summary>
-    internal class SystemHttpListener : IHttpListener
+    internal class SystemHttpListener(System.Net.HttpListener httpListener) : IHttpListener
     {
-        private readonly System.Net.HttpListener _httpListener;
-
-        public SystemHttpListener(System.Net.HttpListener httpListener)
-        {
-            _httpListener = httpListener;
-        }
+        private readonly System.Net.HttpListener _httpListener = httpListener;
 
         /// <inheritdoc />
         public bool IgnoreWriteExceptions

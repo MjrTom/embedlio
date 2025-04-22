@@ -8,18 +8,13 @@ namespace EmbedIO.Routing
     /// Base class for modules that handle requests by resolving route / method pairs associated with handlers.
     /// </summary>
     /// <seealso cref="WebModuleBase" />
-    public abstract class RoutingModuleBase : WebModuleBase
+    /// <inheritdoc cref="WebModuleBase(string)"/>
+    /// <remarks>
+    /// Initializes a new instance of the <see cref="RoutingModuleBase"/> class.
+    /// </remarks>
+    public abstract class RoutingModuleBase(string baseRoute) : WebModuleBase(baseRoute)
     {
-        private readonly RouteVerbResolverCollection _resolvers = new RouteVerbResolverCollection(nameof(RoutingModuleBase));
-
-        /// <inheritdoc cref="WebModuleBase(string)"/>
-        /// <summary>
-        /// Initializes a new instance of the <see cref="RoutingModuleBase"/> class.
-        /// </summary>
-        protected RoutingModuleBase(string baseRoute)
-            : base(baseRoute)
-        {
-        }
+        private readonly RouteVerbResolverCollection _resolvers = new(nameof(RoutingModuleBase));
 
         /// <inheritdoc />
         public override bool IsFinalHandler => true;
@@ -27,7 +22,7 @@ namespace EmbedIO.Routing
         /// <inheritdoc />
         protected override async Task OnRequestAsync(IHttpContext context)
         {
-            var result = await _resolvers.ResolveAsync(context).ConfigureAwait(false);
+            RouteResolutionResult result = await _resolvers.ResolveAsync(context).ConfigureAwait(false);
             switch (result)
             {
                 case RouteResolutionResult.RouteNotMatched:

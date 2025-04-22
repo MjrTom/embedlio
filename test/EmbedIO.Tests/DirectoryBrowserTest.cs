@@ -37,10 +37,10 @@ namespace EmbedIO.Tests
             {
                 var htmlContent = await Client.GetStringAsync(UrlPath.Root);
 
-                Assert.IsNotEmpty(htmlContent);
+                NUnit.Framework.Legacy.ClassicAssert.IsNotEmpty(htmlContent);
 
                 foreach (var file in StaticFolder.WithHtmlFiles.RandomHtmls)
-                    Assert.IsTrue(htmlContent.Contains(file));
+                    NUnit.Framework.Legacy.ClassicAssert.IsTrue(htmlContent.Contains(file));
             }
 
             [Test]
@@ -48,10 +48,10 @@ namespace EmbedIO.Tests
             {
                 var htmlContent = await Client.GetStringAsync("/sub");
 
-                Assert.IsNotEmpty(htmlContent);
+                NUnit.Framework.Legacy.ClassicAssert.IsNotEmpty(htmlContent);
 
                 foreach (var file in StaticFolder.WithHtmlFiles.RandomHtmls)
-                    Assert.IsTrue(htmlContent.Contains(file));
+                    NUnit.Framework.Legacy.ClassicAssert.IsTrue(htmlContent.Contains(file));
             }
         }
     }

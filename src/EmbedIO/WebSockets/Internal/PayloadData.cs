@@ -23,10 +23,10 @@ namespace EmbedIO.WebSockets.Internal
         internal PayloadData(ushort code = 1005, string? reason = null)
         {
             _code = code;
-            _data = code == 1005 ? Array.Empty<byte>() : Append(code, reason);
+            _data = code == 1005 ?[] : Append(code, reason);
         }
 
-        internal MemoryStream ApplicationData => new MemoryStream(_data);
+        internal MemoryStream ApplicationData => new(_data);
 
         internal ulong Length => (ulong)_data.Length;
 
@@ -55,7 +55,8 @@ namespace EmbedIO.WebSockets.Internal
         internal static byte[] Append(ushort code, string? reason)
         {
             var ret = code.ToByteArray(Endianness.Big);
-            if (string.IsNullOrEmpty(reason)) return ret;
+            if (string.IsNullOrEmpty(reason))
+                return ret;
 
             var buff = new List<byte>(ret);
             buff.AddRange(Encoding.UTF8.GetBytes(reason));

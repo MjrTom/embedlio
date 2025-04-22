@@ -1,5 +1,5 @@
-﻿using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+
 using EmbedIO.Routing;
 using EmbedIO.WebApi;
 
@@ -18,7 +18,7 @@ namespace EmbedIO.Tests.TestObjects
                 => HttpContext.SendStringAsync(time, MimeType.PlainText, WebServer.DefaultEncoding);
 
             [Route(HttpVerbs.Any, "/empty")]
-            public void Empty()
+            public static void Empty()
             {
             }
         }

@@ -27,7 +27,7 @@ namespace EmbedIO
         /// </returns>
         public static string SafeGetRemoteEndpointStr(this IHttpRequest @this)
         {
-            var endPoint = @this?.RemoteEndPoint;
+            IPEndPoint? endPoint = @this?.RemoteEndPoint;
             return endPoint == null
                 ? "<null>"
                 : $"{endPoint.Address?.ToString() ?? "<???>"}:{endPoint.Port.ToString(CultureInfo.InvariantCulture)}";
@@ -64,14 +64,15 @@ namespace EmbedIO
             out CompressionMethod compressionMethod,
             out Action<IHttpResponse> prepareResponse)
         {
-            var acceptedEncodings = new QValueList(true, @this.Headers.GetValues(HttpHeaderNames.AcceptEncoding));
+            var acceptedEncodings = new QValueList(true, @this!.Headers.GetValues(HttpHeaderNames.AcceptEncoding));
             if (!acceptedEncodings.TryNegotiateContentEncoding(preferCompression, out compressionMethod, out var compressionMethodName))
             {
                 prepareResponse = r => throw HttpException.NotAcceptable(HttpHeaderNames.AcceptEncoding);
                 return false;
             }
 
-            prepareResponse = r => {
+            prepareResponse = r =>
+            {
                 r.Headers.Add(HttpHeaderNames.Vary, HttpHeaderNames.AcceptEncoding);
                 r.Headers.Set(HttpHeaderNames.ContentEncoding, compressionMethodName);
             };
@@ -147,7 +148,7 @@ namespace EmbedIO
             }
 
             headerExists = true;
-            return HttpDate.TryParse(value, out var dateTime)
+            return HttpDate.TryParse(value, out DateTimeOffset dateTime)
                 && dateTime.UtcDateTime >= lastModifiedUtc;
         }
 
@@ -234,7 +235,7 @@ namespace EmbedIO
             var ifRange = @this.Headers.Get(HttpHeaderNames.IfRange)?.Trim();
             if (ifRange != null && ifRange != entityTag)
             {
-                if (!HttpDate.TryParse(ifRange, out var rangeDate))
+                if (!HttpDate.TryParse(ifRange, out DateTimeOffset rangeDate))
                     return false;
 
                 if (rangeDate.UtcDateTime != lastModifiedUtc)
@@ -242,7 +243,7 @@ namespace EmbedIO
             }
 
             // Ignore the Range request header if it cannot be parsed successfully.
-            if (!RangeHeaderValue.TryParse(rangeHeader, out var range))
+            if (!RangeHeaderValue.TryParse(rangeHeader, out RangeHeaderValue? range))
                 return false;
 
             // EmbedIO does not support multipart/byteranges responses (yet),
@@ -250,7 +251,7 @@ namespace EmbedIO
             if (range.Ranges.Count != 1)
                 return false;
 
-            var firstRange = range.Ranges.First();
+            RangeItemHeaderValue firstRange = range.Ranges.First();
             start = firstRange.From ?? 0L;
             upperBound = firstRange.To ?? contentLength - 1;
             if (start >= contentLength || upperBound < start || upperBound >= contentLength)

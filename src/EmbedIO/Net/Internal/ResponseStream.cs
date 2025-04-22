@@ -1,14 +1,13 @@
 ﻿using System;
 using System.IO;
 using System.Runtime.InteropServices;
-using System.Text;
 
 namespace EmbedIO.Net.Internal
 {
     internal class ResponseStream : Stream
     {
-        private static readonly byte[] CrLf = { 13, 10 };
-        private readonly object _headersSyncRoot = new ();
+        private static readonly byte[] CrLf =[13, 10];
+        private readonly object _headersSyncRoot = new();
 
         private readonly Stream _stream;
         private readonly HttpListenerResponse _response;
@@ -56,7 +55,7 @@ namespace EmbedIO.Net.Internal
             }
 
             byte[] bytes;
-            var ms = GetHeaders(false);
+            MemoryStream? ms = GetHeaders(false);
             var chunked = _response.SendChunked;
 
             if (ms != null)
@@ -136,7 +135,7 @@ namespace EmbedIO.Net.Internal
                 return;
             }
 
-            using var ms = GetHeaders(true);
+            using MemoryStream? ms = GetHeaders(true);
             var chunked = _response.SendChunked;
 
             if (_stream.CanWrite)

@@ -44,7 +44,7 @@ namespace EmbedIO.Files.Internal
         //     - if the result is not a multiple of 16, round it up to next multiple of 16
         private static readonly long SizeOfItem = Environment.Is64BitProcess ? 96 : 128;
 
-        private readonly object _syncRoot = new object();
+        private readonly object _syncRoot = new();
 
         // Used to update total size of section.
         // Weak reference avoids circularity.
@@ -86,13 +86,16 @@ namespace EmbedIO.Files.Internal
             switch (compressionMethod)
             {
                 case CompressionMethod.Deflate:
-                    if (_deflatedContent != null) return _deflatedContent;
+                    if (_deflatedContent != null)
+                        return _deflatedContent;
                     break;
                 case CompressionMethod.Gzip:
-                    if (_gzippedContent != null) return _gzippedContent;
+                    if (_gzippedContent != null)
+                        return _gzippedContent;
                     break;
                 default:
-                    if (_uncompressedContent != null) return _uncompressedContent;
+                    if (_uncompressedContent != null)
+                        return _uncompressedContent;
                     break;
             }
 
@@ -145,7 +148,7 @@ namespace EmbedIO.Files.Internal
 
             var sizeDelta = GetSizeOf(content) - GetSizeOf(oldContent);
             SizeInCache += sizeDelta;
-            if (_section.TryGetTarget(out var section))
+            if (_section.TryGetTarget(out FileCache.Section? section))
                 section.UpdateTotalSize(sizeDelta);
 
             return content;

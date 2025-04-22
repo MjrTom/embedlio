@@ -15,9 +15,9 @@ namespace EmbedIO.Security
     /// <seealso cref="ConfiguredObject" />
     public class IPBanningConfiguration : ConfiguredObject, IDisposable
     {
-        private readonly List<IIPBanningCriterion> _criterions = new List<IIPBanningCriterion>();
-        private readonly ConcurrentDictionary<IPAddress, BanInfo> _blacklistDictionary = new ConcurrentDictionary<IPAddress, BanInfo>();
-        private readonly ConcurrentBag<IPAddress> _whiteListBag = new ConcurrentBag<IPAddress>();
+        private readonly List<IIPBanningCriterion> _criterions = new();
+        private readonly ConcurrentDictionary<IPAddress, BanInfo> _blacklistDictionary = new();
+        private readonly ConcurrentBag<IPAddress> _whiteListBag = new();
         private readonly int _banTime;
         private bool _disposed;
 
@@ -47,7 +47,7 @@ namespace EmbedIO.Security
         /// </summary>
         /// <param name="address">The address.</param>
         /// <returns><c>true</c> if the Criterion should continue, otherwise <c>false</c>.</returns>
-        public bool ShouldContinue(IPAddress address) => 
+        public bool ShouldContinue(IPAddress address) =>
             !_whiteListBag.Contains(address) || !_blacklistDictionary.ContainsKey(address);
 
         /// <summary>
@@ -57,7 +57,7 @@ namespace EmbedIO.Security
         {
             PurgeBlackList();
 
-            foreach (var criterion in _criterions)
+            foreach (IIPBanningCriterion criterion in _criterions)
             {
                 criterion.PurgeData();
             }
@@ -73,11 +73,12 @@ namespace EmbedIO.Security
             if (_whiteListBag.Contains(clientAddress))
                 return;
 
-            foreach (var criterion in _criterions)
+            foreach (IIPBanningCriterion criterion in _criterions)
             {
                 var result = await criterion.ValidateIPAddress(clientAddress).ConfigureAwait(false);
 
-                if (!result) continue;
+                if (!result)
+                    continue;
 
                 TryBanIP(clientAddress, false);
                 break;
@@ -86,7 +87,7 @@ namespace EmbedIO.Security
             if (_blacklistDictionary.ContainsKey(clientAddress))
                 throw HttpException.Forbidden();
         }
-        
+
         /// <inheritdoc />
         public void Dispose()
         {
@@ -101,19 +102,19 @@ namespace EmbedIO.Security
 
             foreach (var whiteAddress in whitelist)
             {
-                var parsedAddresses = await IPParser.ParseAsync(whiteAddress).ConfigureAwait(false);
-                foreach (var address in parsedAddresses.Where(x => !_whiteListBag.Contains(x)))
+                IEnumerable<IPAddress> parsedAddresses = await IPParser.ParseAsync(whiteAddress).ConfigureAwait(false);
+                foreach (IPAddress? address in parsedAddresses.Where(x => !_whiteListBag.Contains(x)))
                 {
                     _whiteListBag.Add(address);
                 }
             }
         }
-        
+
         internal void Lock() => LockConfiguration();
 
         internal bool TryRemoveBlackList(IPAddress address)
         {
-            foreach (var criterion in _criterions)
+            foreach (IIPBanningCriterion criterion in _criterions)
             {
                 criterion.ClearIPAddress(address);
             }
@@ -177,11 +178,13 @@ namespace EmbedIO.Security
 
         private void PurgeBlackList()
         {
-            foreach (var k in _blacklistDictionary.Keys)
+            foreach (IPAddress k in _blacklistDictionary.Keys)
             {
-                if (_blacklistDictionary.TryGetValue(k, out var info) &&
+                if (_blacklistDictionary.TryGetValue(k, out BanInfo? info) &&
                     DateTime.Now.Ticks > info.ExpiresAt)
+                {
                     _blacklistDictionary.TryRemove(k, out _);
+                }
             }
         }
     }

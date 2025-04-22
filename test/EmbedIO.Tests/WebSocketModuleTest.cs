@@ -3,8 +3,8 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using EmbedIO.Tests.TestObjects;
-using NUnit.Framework;
 using Swan.Formatters;
+using NUnit.Framework;
 
 namespace EmbedIO.Tests
 {
@@ -28,19 +28,19 @@ namespace EmbedIO.Tests
         public async Task TestConnectWebSocket()
         {
             var websocketUrl = new Uri(WebServerUrl.Replace("http", "ws") + "test");
-            
+
             var clientSocket = new System.Net.WebSockets.ClientWebSocket();
             await clientSocket.ConnectAsync(websocketUrl, default);
-            
-            Assert.AreEqual(
-                System.Net.WebSockets.WebSocketState.Open, 
-                clientSocket.State, 
+
+            NUnit.Framework.Legacy.ClassicAssert.AreEqual(
+                System.Net.WebSockets.WebSocketState.Open,
+                clientSocket.State,
                 $"Connection should be open, but the status is {clientSocket.State} - {websocketUrl}");
 
             var buffer = new ArraySegment<byte>(Encoding.UTF8.GetBytes("HOLA"));
             await clientSocket.SendAsync(buffer, System.Net.WebSockets.WebSocketMessageType.Text, true, default);
 
-            Assert.AreEqual(await ReadString(clientSocket), "HELLO");
+            NUnit.Framework.Legacy.ClassicAssert.AreEqual(await ReadString(clientSocket), "HELLO");
         }
 
         [Test]
@@ -50,12 +50,12 @@ namespace EmbedIO.Tests
 
             var clientSocket = new System.Net.WebSockets.ClientWebSocket();
             await clientSocket.ConnectAsync(webSocketUrl, default).ConfigureAwait(false);
-            
+
             var buffer = new ArraySegment<byte>(Encoding.UTF8.GetBytes("HOLA"));
             await clientSocket.SendAsync(buffer, System.Net.WebSockets.WebSocketMessageType.Text, true, default).ConfigureAwait(false);
 
             var json = await ReadString(clientSocket).ConfigureAwait(false);
-            Assert.AreEqual(Json.Serialize(BigDataWebSocket.BigDataObject), json);
+            NUnit.Framework.Legacy.ClassicAssert.AreEqual(Json.Serialize(BigDataWebSocket.BigDataObject), json);
         }
 
         [Test]
@@ -67,10 +67,10 @@ namespace EmbedIO.Tests
             await clientSocket.ConnectAsync(webSocketUrl, default).ConfigureAwait(false);
 
             var buffer = new ArraySegment<byte>(new byte[8192]);
-            var result = await clientSocket.ReceiveAsync(buffer, default).ConfigureAwait(false);
+            System.Net.WebSockets.WebSocketReceiveResult result = await clientSocket.ReceiveAsync(buffer, default).ConfigureAwait(false);
 
-            Assert.IsTrue(result.CloseStatus.HasValue);
-            Assert.IsTrue(result.CloseStatus.Value == System.Net.WebSockets.WebSocketCloseStatus.InvalidPayloadData);
+            NUnit.Framework.Legacy.ClassicAssert.IsTrue(result.CloseStatus.HasValue);
+            NUnit.Framework.Legacy.ClassicAssert.IsTrue(result.CloseStatus.Value == System.Net.WebSockets.WebSocketCloseStatus.InvalidPayloadData);
         }
 
         protected static async Task<string> ReadString(System.Net.WebSockets.ClientWebSocket ws)
@@ -83,7 +83,7 @@ namespace EmbedIO.Tests
             do
             {
                 result = await ws.ReceiveAsync(buffer, default);
-                ms.Write(buffer.Array, buffer.Offset, result.Count);
+                ms.Write(buffer!.Array, buffer.Offset, result.Count);
             }
             while (!result.EndOfMessage);
 

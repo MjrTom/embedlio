@@ -5,7 +5,7 @@ using EmbedIO.Internal;
 
 namespace EmbedIO
 {
-    partial class HttpContextExtensions
+    static partial class HttpContextExtensions
     {
         /// <summary>
         /// <para>Wraps the response output stream and returns a <see cref="Stream"/> that can be used directly.</para>
@@ -27,11 +27,12 @@ namespace EmbedIO
         {
             // No need to check whether negotiation is successful;
             // the returned callback will throw HttpNotAcceptableException if it was not.
-            _ = @this.Request.TryNegotiateContentEncoding(preferCompression, out var compressionMethod, out var prepareResponse);
+            _ = @this.Request.TryNegotiateContentEncoding(preferCompression, out CompressionMethod compressionMethod, out System.Action<IHttpResponse>? prepareResponse);
             prepareResponse(@this.Response);
-            var stream = buffered ? new BufferingResponseStream(@this.Response) : @this.Response.OutputStream;
+            Stream stream = buffered ? new BufferingResponseStream(@this.Response) : @this.Response.OutputStream;
 
-            return compressionMethod switch {
+            return compressionMethod switch
+            {
                 CompressionMethod.Gzip => new GZipStream(stream, CompressionMode.Compress),
                 CompressionMethod.Deflate => new DeflateStream(stream, CompressionMode.Compress),
                 _ => stream

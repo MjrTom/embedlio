@@ -59,7 +59,7 @@ namespace EmbedIO.Net.Internal
             get => _response.ContentEncoding;
             set => _response.ContentEncoding = value;
         }
-        
+
         /// <inheritdoc />
         public bool KeepAlive
         {
@@ -82,7 +82,7 @@ namespace EmbedIO.Net.Internal
         }
 
         /// <inheritdoc />
-        public string StatusDescription 
+        public string StatusDescription
         {
             get => _response.StatusDescription;
             set => _response.StatusDescription = value;

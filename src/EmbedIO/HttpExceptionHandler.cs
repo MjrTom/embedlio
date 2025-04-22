@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Net;
 using System.Runtime.ExceptionServices;
-using System.Text;
 using System.Threading.Tasks;
 using System.Web;
+
 using EmbedIO.Utilities;
+
 using Swan.Logging;
 
 namespace EmbedIO
@@ -63,7 +64,8 @@ namespace EmbedIO
         public static Task HtmlResponse(IHttpContext context, IHttpException httpException)
             => context.SendStandardHtmlAsync(
                 httpException.StatusCode,
-                text => {
+                text =>
+                {
                     text.Write(
                         "<p><strong>Exception type:</strong> {0}<p><strong>Message:</strong> {1}",
                         HttpUtility.HtmlEncode(httpException.GetType().FullName ?? "<unknown>"),
@@ -120,7 +122,7 @@ namespace EmbedIO
 
         internal static async Task Handle(string logSource, IHttpContext context, Exception exception, HttpExceptionHandlerCallback? handler)
         {
-            if (handler == null || !(exception is IHttpException httpException))
+            if (handler == null || exception is not IHttpException httpException)
             {
                 ExceptionDispatchInfo.Capture(exception).Throw();
                 return;

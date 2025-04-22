@@ -22,7 +22,7 @@ namespace EmbedIO.WebApi
         public async Task<object?> GetRequestDataAsync(WebApiController controller, Type type, string parameterName)
         {
             string body;
-            using (var reader = controller.HttpContext.OpenRequestText())
+            using (System.IO.TextReader reader = controller.HttpContext.OpenRequestText())
             {
                 body = await reader.ReadToEndAsync().ConfigureAwait(false);
             }

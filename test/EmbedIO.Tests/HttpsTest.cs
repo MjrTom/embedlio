@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Net;
-using System.Net.Http;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading.Tasks;
+
 using EmbedIO.Tests.TestObjects;
+
 using NUnit.Framework;
+
 using Swan;
 
 namespace EmbedIO.Tests
@@ -23,8 +22,9 @@ namespace EmbedIO.Tests
             if (SwanRuntime.OS == Swan.OperatingSystem.Windows)
                 Assert.Ignore("Ignore Windows");
 
-            Assert.Throws<PlatformNotSupportedException>(() => {
-                var options = new WebServerOptions()
+            Assert.Throws<PlatformNotSupportedException>(() =>
+            {
+                WebServerOptions options = new WebServerOptions()
                     .WithUrlPrefix(HttpsUrl)
                     .WithAutoLoadCertificate();
 
@@ -38,7 +38,7 @@ namespace EmbedIO.Tests
             if (SwanRuntime.OS != Swan.OperatingSystem.Windows)
                 Assert.Ignore("Only Windows");
 
-            var options = new WebServerOptions()
+            WebServerOptions options = new WebServerOptions()
                 .WithUrlPrefix(HttpsUrl)
                 .WithAutoRegisterCertificate();
 
@@ -51,7 +51,7 @@ namespace EmbedIO.Tests
             if (SwanRuntime.OS != Swan.OperatingSystem.Windows)
                 Assert.Ignore("Only Windows");
 
-            var options = new WebServerOptions()
+            WebServerOptions options = new WebServerOptions()
                 .WithUrlPrefix(HttpsUrl)
                 .WithCertificate(new X509Certificate2())
                 .WithAutoRegisterCertificate();

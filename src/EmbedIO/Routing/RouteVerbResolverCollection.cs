@@ -63,7 +63,8 @@ namespace EmbedIO.Routing
         /// will count as one for each attribute.</para>
         /// </returns>
         /// <exception cref="ArgumentNullException"><paramref name="target"/> is <see langword="null"/>.</exception>
-        public int AddFrom(object target) => Validate.NotNull(nameof(target), target) switch {
+        public int AddFrom(object target) => Validate.NotNull(nameof(target), target) switch
+        {
             Type type => AddFrom(null, type),
             Assembly assembly => assembly.GetExportedTypes().Sum(t => AddFrom(null, t)),
             MethodInfo method => method.IsStatic ? Add(null, method) : 0,
@@ -72,7 +73,7 @@ namespace EmbedIO.Routing
         };
 
         /// <inheritdoc />
-        protected override RouteVerbResolver CreateResolver(RouteMatcher matcher) => new RouteVerbResolver(matcher);
+        protected override RouteVerbResolver CreateResolver(RouteMatcher matcher) => new(matcher);
 
         /// <inheritdoc />
         protected override void OnResolverCalled(IHttpContext context, RouteVerbResolver resolver, RouteResolutionResult result)
@@ -81,7 +82,7 @@ namespace EmbedIO.Routing
         private static bool IsHandlerCompatibleMethod(MethodInfo method, out bool isSynchronous)
         {
             isSynchronous = false;
-            var returnType = method.ReturnType;
+            Type returnType = method.ReturnType;
             if (returnType == typeof(void))
             {
                 isSynchronous = true;
@@ -91,7 +92,7 @@ namespace EmbedIO.Routing
                 return false;
             }
 
-            var parameters = method.GetParameters();
+            ParameterInfo[] parameters = method.GetParameters();
             return parameters.Length == 2
                 && parameters[0].ParameterType.IsAssignableFrom(typeof(IHttpContext))
                 && parameters[1].ParameterType.IsAssignableFrom(typeof(RouteMatch));
@@ -112,14 +113,14 @@ namespace EmbedIO.Routing
             if (!IsHandlerCompatibleMethod(method, out var isSynchronous))
                 return 0;
 
-            var attributes = method.GetCustomAttributes(true).OfType<RouteAttribute>().ToArray();
+            RouteAttribute[] attributes = method.GetCustomAttributes(true).OfType<RouteAttribute>().ToArray();
             if (attributes.Length == 0)
                 return 0;
 
-            var parameters = new[] {
+            ParameterExpression[] parameters =[
                 Expression.Parameter(typeof(IHttpContext), "context"),
                 Expression.Parameter(typeof(RouteMatch), "route"),
-            };
+            ];
 
             Expression body = Expression.Call(Expression.Constant(target), method, parameters.Cast<Expression>());
             if (isSynchronous)
@@ -128,8 +129,8 @@ namespace EmbedIO.Routing
                 body = Expression.Block(typeof(Task), body, Expression.Constant(Task.CompletedTask));
             }
 
-            var handler = Expression.Lambda<RouteHandlerCallback>(body, parameters).Compile();
-            foreach (var attribute in attributes)
+            RouteHandlerCallback handler = Expression.Lambda<RouteHandlerCallback>(body, parameters).Compile();
+            foreach (RouteAttribute? attribute in attributes)
             {
                 Add(attribute.Verb, attribute.Matcher, handler);
             }
