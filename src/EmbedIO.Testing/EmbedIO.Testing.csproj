@@ -1,23 +1,25 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <AssemblyTitle>EmbedIO Web Server Testing</AssemblyTitle>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFrameworks>net8.0;netstandard2.0</TargetFrameworks>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <RepositoryUrl>https://github.com/MjrTom/embedlio/</RepositoryUrl>
   </PropertyGroup>
-
   <ItemGroup>
     <None Remove="Resources\index.html" />
     <None Remove="Resources\sub\index.html" />
   </ItemGroup>
-
   <ItemGroup>
     <EmbeddedResource Include="Resources\index.html" />
     <EmbeddedResource Include="Resources\sub\index.html" />
   </ItemGroup>
-
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\EmbedIO\EmbedIO.csproj" />
   </ItemGroup>
-
 </Project>
