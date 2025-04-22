@@ -1,13 +1,13 @@
 ﻿using System;
 using System.IO;
-using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+
 using EmbedIO.Utilities;
 
 namespace EmbedIO
 {
-    partial class HttpContextExtensions
+    static partial class HttpContextExtensions
     {
         private const string StandardHtmlHeaderFormat = "<html><head><meta charset=\"{2}\"><title>{0} - {1}</title></head><body><h1>{0} - {1}</h1>";
         private const string StandardHtmlFooter = "</body></html>";
@@ -41,7 +41,7 @@ namespace EmbedIO
                 @this.Response.ContentEncoding = encoding;
             }
 
-            using var text = @this.OpenResponseText(encoding);
+            using TextWriter text = @this.OpenResponseText(encoding);
             await text.WriteAsync(content).ConfigureAwait(false);
         }
 
@@ -69,7 +69,7 @@ namespace EmbedIO
         /// <exception cref="NullReferenceException"><paramref name="this"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentException">There is no standard status description for <paramref name="statusCode"/>.</exception>
         /// <seealso cref="SendStandardHtmlAsync(IHttpContext,int)"/>
-        public static Task SendStandardHtmlAsync(
+        public static async Task SendStandardHtmlAsync(
             this IHttpContext @this,
             int statusCode,
             Action<TextWriter>? writeAdditionalHtml)
@@ -81,14 +81,14 @@ namespace EmbedIO
             @this.Response.StatusDescription = statusDescription;
             @this.Response.ContentType = MimeType.Html;
             @this.Response.ContentEncoding = WebServer.DefaultEncoding;
-            using (var text = @this.OpenResponseText(WebServer.DefaultEncoding))
+            using (TextWriter text = @this.OpenResponseText(WebServer.DefaultEncoding))
             {
                 text.Write(StandardHtmlHeaderFormat, statusCode, statusDescription, WebServer.DefaultEncoding.WebName);
                 writeAdditionalHtml?.Invoke(text);
                 text.Write(StandardHtmlFooter);
             }
 
-            return Task.CompletedTask;
+            await Task.CompletedTask;
         }
 
         /// <summary>

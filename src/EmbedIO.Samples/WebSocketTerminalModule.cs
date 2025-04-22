@@ -11,18 +11,13 @@ namespace EmbedIO.Samples
     /// <summary>
     /// Define a command-line interface terminal.
     /// </summary>
-    public class WebSocketTerminalModule : WebSocketModule
+    public class WebSocketTerminalModule(string urlPath) : WebSocketModule(urlPath, true)
     {
-        private readonly ConcurrentDictionary<IWebSocketContext, Process> _processes = new ConcurrentDictionary<IWebSocketContext, Process>();
-
-        public WebSocketTerminalModule(string urlPath)
-            : base(urlPath, true)
-        {
-        }
+        private readonly ConcurrentDictionary<IWebSocketContext, Process> _processes = new();
 
         /// <inheritdoc />
         protected override Task OnMessageReceivedAsync(IWebSocketContext context, byte[] rxBuffer, IWebSocketReceiveResult rxResult)
-            => _processes.TryGetValue(context, out var process)
+            => _processes.TryGetValue(context, out Process? process)
                 ? process.StandardInput.WriteLineAsync(Encoding.GetString(rxBuffer))
                 : Task.CompletedTask;
 
@@ -43,17 +38,17 @@ namespace EmbedIO.Samples
                     RedirectStandardOutput = true,
                     UseShellExecute = false,
                     WorkingDirectory = Environment.CurrentDirectory
-                }
+                },
             };
 #pragma warning restore CA2000
 
-            process.OutputDataReceived += async (s, e) => await SendBufferAsync(s as Process, e.Data).ConfigureAwait(false);
+            process.OutputDataReceived += async (s, e) => await SendBufferAsync(s! as Process, e!.Data).ConfigureAwait(false);
 
-            process.ErrorDataReceived += async (s, e) => await SendBufferAsync(s as Process, e.Data).ConfigureAwait(false);
+            process.ErrorDataReceived += async (s, e) => await SendBufferAsync(s! as Process, e!.Data).ConfigureAwait(false);
 
             process.Exited += async (s, e) =>
             {
-                var ctx = FindContext(s as Process);
+                IWebSocketContext ctx = FindContext(s! as Process);
                 if (ctx?.WebSocket?.State == WebSocketState.Open)
                     await CloseAsync(ctx).ConfigureAwait(false);
             };
@@ -70,7 +65,7 @@ namespace EmbedIO.Samples
         /// <inheritdoc />
         protected override Task OnClientDisconnectedAsync(IWebSocketContext context)
         {
-            if (_processes.TryRemove(context, out var process))
+            if (_processes.TryRemove(context, out Process? process))
             {
                 if (!process.HasExited)
                     process.Kill();
@@ -84,22 +79,23 @@ namespace EmbedIO.Samples
         private IWebSocketContext FindContext(Process p)
             => _processes.FirstOrDefault(kvp => kvp.Value == p).Key;
 
-        private Task SendBufferAsync(Process process, string buffer)
+        private async Task SendBufferAsync(Process process, string buffer)
         {
             try
             {
                 if (process.HasExited)
-                    return Task.CompletedTask;
-
-                var context = FindContext(process);
-                return context?.WebSocket?.State == WebSocketState.Open
+                    await Task.CompletedTask;
+                IWebSocketContext context = FindContext(process);
+                await (context?.WebSocket?.State == WebSocketState.Open
                     ? SendAsync(context, buffer)
-                    : Task.CompletedTask;
+                    : Task.CompletedTask);
+                return;
             }
             catch
             {
                 // ignore process teermination
-                return Task.CompletedTask;
+                await Task.CompletedTask;
+                return;
             }
         }
     }

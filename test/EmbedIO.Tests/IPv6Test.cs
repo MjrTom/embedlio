@@ -1,5 +1,7 @@
 ﻿using NUnit.Framework;
+
 using Swan;
+
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -19,10 +21,10 @@ namespace EmbedIO.Tests
             var instance = new WebServer(HttpListenerMode.EmbedIO, "http://*:8877");
             instance.OnAny(ctx => ctx.SendDataAsync(DateTime.Now));
 
-            _= instance.RunAsync();
+            _ = instance.RunAsync();
 
             using var client = new HttpClient();
-            Assert.IsNotEmpty(await client.GetStringAsync(urlTest));
+            NUnit.Framework.Legacy.ClassicAssert.IsNotEmpty(await client.GetStringAsync(urlTest));
         }
 
         [Test]
@@ -37,7 +39,7 @@ namespace EmbedIO.Tests
             _ = instance.RunAsync();
 
             using var client = new HttpClient();
-            Assert.IsNotEmpty(await client.GetStringAsync("http://[::1]:8877"));
+            NUnit.Framework.Legacy.ClassicAssert.IsNotEmpty(await client.GetStringAsync("http://[::1]:8877"));
         }
     }
 }

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
+
 using EmbedIO.Routing;
+
 using NUnit.Framework;
 
 namespace EmbedIO.Tests
@@ -20,9 +22,9 @@ namespace EmbedIO.Tests
         {
             RouteMatcher.ClearCache();
 
-            Assert.IsFalse(Route.IsValid(route, false));
+            NUnit.Framework.Legacy.ClassicAssert.IsFalse(Route.IsValid(route, false));
             Assert.Throws<FormatException>(() => RouteMatcher.Parse(route, false));
-            Assert.IsFalse(RouteMatcher.TryParse(route, false, out _));
+            NUnit.Framework.Legacy.ClassicAssert.IsFalse(RouteMatcher.TryParse(route, false, out _));
         }
 
         [TestCase("")] // Route is empty.
@@ -37,9 +39,9 @@ namespace EmbedIO.Tests
         {
             RouteMatcher.ClearCache();
 
-            Assert.IsFalse(Route.IsValid(route, true));
+            NUnit.Framework.Legacy.ClassicAssert.IsFalse(Route.IsValid(route, true));
             Assert.Throws<FormatException>(() => RouteMatcher.Parse(route, true));
-            Assert.IsFalse(RouteMatcher.TryParse(route, true, out _));
+            NUnit.Framework.Legacy.ClassicAssert.IsFalse(RouteMatcher.TryParse(route, true, out _));
         }
 
         [TestCase("/")] // Root.
@@ -56,9 +58,9 @@ namespace EmbedIO.Tests
         {
             RouteMatcher.ClearCache();
 
-            Assert.IsTrue(Route.IsValid(route, false));
+            NUnit.Framework.Legacy.ClassicAssert.IsTrue(Route.IsValid(route, false));
             Assert.DoesNotThrow(() => RouteMatcher.Parse(route, false));
-            Assert.IsTrue(RouteMatcher.TryParse(route, false, out _));
+            NUnit.Framework.Legacy.ClassicAssert.IsTrue(RouteMatcher.TryParse(route, false, out _));
         }
 
         [TestCase("/")] // Root.
@@ -73,9 +75,9 @@ namespace EmbedIO.Tests
         {
             RouteMatcher.ClearCache();
 
-            Assert.IsTrue(Route.IsValid(route, true));
+            NUnit.Framework.Legacy.ClassicAssert.IsTrue(Route.IsValid(route, true));
             Assert.DoesNotThrow(() => RouteMatcher.Parse(route, true));
-            Assert.IsTrue(RouteMatcher.TryParse(route, true, out _));
+            NUnit.Framework.Legacy.ClassicAssert.IsTrue(RouteMatcher.TryParse(route, true, out _));
         }
 
         [TestCase("/")] // Root.
@@ -92,10 +94,10 @@ namespace EmbedIO.Tests
         {
             RouteMatcher.ClearCache();
 
-            Assert.IsTrue(RouteMatcher.TryParse(route, false, out var matcher));
-            Assert.AreEqual(parameterNames.Length, matcher.ParameterNames.Count);
+            NUnit.Framework.Legacy.ClassicAssert.IsTrue(RouteMatcher.TryParse(route, false, out RouteMatcher? matcher));
+            NUnit.Framework.Legacy.ClassicAssert.AreEqual(parameterNames.Length, matcher.ParameterNames.Count);
             for (var i = 0; i < parameterNames.Length; i++)
-                Assert.AreEqual(parameterNames[i], matcher.ParameterNames[i]);
+                NUnit.Framework.Legacy.ClassicAssert.AreEqual(parameterNames[i], matcher.ParameterNames[i]);
         }
 
         [TestCase("/", "/")] // Root.
@@ -113,21 +115,21 @@ namespace EmbedIO.Tests
             RouteMatcher.ClearCache();
 
             var parameterCount = parameters.Length / 2;
-            Assert.IsTrue(RouteMatcher.TryParse(route, false, out var matcher));
-            Assert.AreEqual(parameterCount, matcher.ParameterNames.Count);
+            NUnit.Framework.Legacy.ClassicAssert.IsTrue(RouteMatcher.TryParse(route, false, out RouteMatcher? matcher));
+            NUnit.Framework.Legacy.ClassicAssert.AreEqual(parameterCount, matcher.ParameterNames.Count);
             for (var i = 0; i < parameterCount; i++)
-                Assert.AreEqual(parameters[2 * i], matcher.ParameterNames[i]);
+                NUnit.Framework.Legacy.ClassicAssert.AreEqual(parameters[2 * i], matcher.ParameterNames[i]);
 
-            var match = matcher.Match(path);
-            Assert.IsNotNull(match);
+            RouteMatch? match = matcher.Match(path);
+            NUnit.Framework.Legacy.ClassicAssert.IsNotNull(match);
             var keys = match.Keys.ToArray();
             var values = match.Values.ToArray();
-            Assert.AreEqual(parameterCount, keys.Length);
-            Assert.AreEqual(parameterCount, values.Length);
+            NUnit.Framework.Legacy.ClassicAssert.AreEqual(parameterCount, keys.Length);
+            NUnit.Framework.Legacy.ClassicAssert.AreEqual(parameterCount, values.Length);
             for (var i = 0; i < parameterCount; i++)
             {
-                Assert.AreEqual(parameters[2 * i], keys[i]);
-                Assert.AreEqual(parameters[(2 * i) + 1], values[i]);
+                NUnit.Framework.Legacy.ClassicAssert.AreEqual(parameters[2 * i], keys[i]);
+                NUnit.Framework.Legacy.ClassicAssert.AreEqual(parameters[(2 * i) + 1], values[i]);
             }
         }
 
@@ -145,11 +147,11 @@ namespace EmbedIO.Tests
         {
             RouteMatcher.ClearCache();
 
-            Assert.IsTrue(RouteMatcher.TryParse(route, true, out var matcher));
+            NUnit.Framework.Legacy.ClassicAssert.IsTrue(RouteMatcher.TryParse(route, true, out RouteMatcher? matcher));
 
-            var match = matcher.Match(path);
-            Assert.IsNotNull(match);
-            Assert.AreEqual(subPath, match.SubPath);
+            RouteMatch? match = matcher.Match(path);
+            NUnit.Framework.Legacy.ClassicAssert.IsNotNull(match);
+            NUnit.Framework.Legacy.ClassicAssert.AreEqual(subPath, match.SubPath);
         }
     }
 }

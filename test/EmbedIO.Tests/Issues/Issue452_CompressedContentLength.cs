@@ -2,7 +2,9 @@
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+
 using EmbedIO.Utilities;
+
 using NUnit.Framework;
 
 namespace EmbedIO.Tests.Issues
@@ -19,8 +21,8 @@ namespace EmbedIO.Tests.Issues
             request.Headers.AcceptEncoding.Clear();
             request.Headers.AcceptEncoding.Add(new StringWithQualityHeaderValue("gzip"));
 
-            using var response = await Client.SendAsync(request);
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "Status Code OK");
+            using HttpResponseMessage response = await Client.SendAsync(request);
+            NUnit.Framework.Legacy.ClassicAssert.AreEqual(HttpStatusCode.OK, response.StatusCode, "Status Code OK");
         }
     }
 }

@@ -10,7 +10,7 @@ namespace EmbedIO.WebSockets.Internal
     internal class WebSocketFrame
     {
         internal static readonly byte[] EmptyPingBytes = CreatePingFrame().ToArray();
-        
+
         internal WebSocketFrame(Opcode opcode, PayloadData payloadData)
             : this(Fin.Final, opcode, payloadData)
         {
@@ -37,7 +37,7 @@ namespace EmbedIO.WebSockets.Internal
             if (len < 126)
             {
                 PayloadLength = (byte)len;
-                ExtendedPayloadLength = Array.Empty<byte>();
+                ExtendedPayloadLength =[];
             }
             else if (len < 0x010000)
             {
@@ -51,7 +51,7 @@ namespace EmbedIO.WebSockets.Internal
             }
 
             Mask = Mask.Off;
-            MaskingKey = Array.Empty<byte>();
+            MaskingKey =[];
             PayloadData = payloadData;
         }
 
@@ -104,8 +104,8 @@ namespace EmbedIO.WebSockets.Internal
         internal ulong FullPayloadLength => PayloadLength < 126
             ? PayloadLength
             : PayloadLength == 126
-                ? BitConverter.ToUInt16(ExtendedPayloadLength.ToHostOrder(Endianness.Big), 0)
-                : BitConverter.ToUInt64(ExtendedPayloadLength.ToHostOrder(Endianness.Big), 0);
+                ? BitConverter.ToUInt16(ExtendedPayloadLength!.ToHostOrder(Endianness.Big), 0)
+                : BitConverter.ToUInt64(ExtendedPayloadLength!.ToHostOrder(Endianness.Big), 0);
 
         public IEnumerator<byte> GetEnumerator() => ((IEnumerable<byte>)ToArray()).GetEnumerator();
 
@@ -157,7 +157,7 @@ Extended Payload Length: {extPayloadLen}
 
             if (PayloadLength > 125)
             {
-                buff.Write(ExtendedPayloadLength, 0, PayloadLength == 126 ? 2 : 8);
+                buff.Write(ExtendedPayloadLength!, 0, PayloadLength == 126 ? 2 : 8);
             }
 
             if (Mask == Mask.On)
@@ -184,11 +184,11 @@ Extended Payload Length: {extPayloadLen}
 
         public override string ToString() => BitConverter.ToString(ToArray());
 
-        internal static WebSocketFrame CreateCloseFrame(PayloadData? payloadData) => new (Fin.Final, Opcode.Close, payloadData ?? new PayloadData());
+        internal static WebSocketFrame CreateCloseFrame(PayloadData? payloadData) => new(Fin.Final, Opcode.Close, payloadData ?? new PayloadData());
 
-        internal static WebSocketFrame CreatePingFrame() => new (Fin.Final, Opcode.Ping, new PayloadData());
+        internal static WebSocketFrame CreatePingFrame() => new(Fin.Final, Opcode.Ping, new PayloadData());
 
-        internal static WebSocketFrame CreatePingFrame(byte[] data) => new (Fin.Final, Opcode.Ping, new PayloadData(data));
+        internal static WebSocketFrame CreatePingFrame(byte[] data) => new(Fin.Final, Opcode.Ping, new PayloadData(data));
 
         internal void Validate(WebSocket webSocket)
         {
@@ -231,9 +231,9 @@ Extended Payload Length: {extPayloadLen}
 
             Mask = Mask.Off;
             PayloadData.Mask(MaskingKey);
-            MaskingKey = Array.Empty<byte>();
+            MaskingKey =[];
         }
 
-        private static bool IsOpcodeData(Opcode opcode) => opcode == Opcode.Text || opcode == Opcode.Binary;
+        private static bool IsOpcodeData(Opcode opcode) => opcode is Opcode.Text or Opcode.Binary;
     }
 }

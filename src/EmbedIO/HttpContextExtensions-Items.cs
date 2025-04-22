@@ -2,7 +2,7 @@
 
 namespace EmbedIO
 {
-    partial class HttpContextExtensions
+    static partial class HttpContextExtensions
     {
         /// <summary>Gets the item associated with the specified key.</summary>
         /// <typeparam name="T">The desired type of the item.</typeparam>
@@ -28,7 +28,7 @@ namespace EmbedIO
             }
 
 #pragma warning disable CS8653 // value is non-nullable - We are returning false, so value is undefined.
-            value = default;
+            value = default!;
 #pragma warning restore CS8653
             return false;
         }
@@ -41,7 +41,7 @@ namespace EmbedIO
         /// if the key is found in <see cref="IHttpContext.Items">Items</see>
         /// and the associated value is of type <typeparamref name="T"/>;
         /// otherwise, the default value for <typeparamref name="T"/>.</returns>
-        public static T GetItem<T>(this IHttpContext @this, object key)
+        public static T? GetItem<T>(this IHttpContext @this, object key)
             => @this.Items.TryGetValue(key, out var item) && item is T typedItem ? typedItem : default;
     }
 }

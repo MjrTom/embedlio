@@ -7,17 +7,11 @@ using EmbedIO.Utilities;
 
 namespace EmbedIO.Testing.Internal
 {
-    internal sealed partial class TestMessageHandler : HttpMessageHandler
+    internal sealed partial class TestMessageHandler(IHttpContextHandler handler) : HttpMessageHandler
     {
-        private readonly IHttpContextHandler _handler;
+        private readonly IHttpContextHandler _handler = Validate.NotNull(nameof(handler), handler);
 
-        public TestMessageHandler(IHttpContextHandler handler)
-        {
-            _handler = Validate.NotNull(nameof(handler), handler);
-            CookieContainer = new CookieContainer();
-        }
-
-        public CookieContainer CookieContainer { get; }
+        public CookieContainer CookieContainer { get; } = new CookieContainer();
 
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
@@ -29,12 +23,11 @@ namespace EmbedIO.Testing.Internal
             var context = new TestContext(serverRequest)
             {
                 CancellationToken = cancellationToken,
-                Route = RouteMatch.UnsafeFromRoot(UrlPath.Normalize(serverRequest.Url.AbsolutePath, false))
-
+                Route = RouteMatch.UnsafeFromRoot(UrlPath.Normalize(serverRequest.Url.AbsolutePath, false)),
             };
 
             await _handler.HandleContextAsync(context).ConfigureAwait(false);
-            var serverResponse = context.TestResponse;
+            TestResponse serverResponse = context.TestResponse;
             var responseCookies = serverResponse.Headers.Get(HttpHeaderNames.SetCookie);
             if (!string.IsNullOrEmpty(responseCookies))
                 CookieContainer.SetCookies(serverRequest.Url, responseCookies);
@@ -51,10 +44,10 @@ namespace EmbedIO.Testing.Internal
                 switch (GetResponseHeaderType(key))
                 {
                     case ResponseHeaderType.Content:
-                        response.Content?.Headers.Add(key, serverResponse.Headers.GetValues(key));
+                        response.Content?.Headers.Add(key, serverResponse!.Headers.GetValues(key));
                         break;
                     case ResponseHeaderType.Response:
-                        response.Headers.Add(key, serverResponse.Headers.GetValues(key));
+                        response.Headers.Add(key, serverResponse!.Headers.GetValues(key));
                         break;
                 }
             }
@@ -70,7 +63,8 @@ namespace EmbedIO.Testing.Internal
         // because nobody outside the .NET team will ever need them, right?
         // https://github.com/dotnet/corefx/blob/master/src/System.Net.Http/src/System/Net/Http/Headers/KnownHeaders.cs
         // Here are the "content" headers, extracted on 2019-07-06:
-        private static ResponseHeaderType GetResponseHeaderType(string name) => name switch {
+        private static ResponseHeaderType GetResponseHeaderType(string name) => name switch
+        {
             // Content-Length is set automatically and shall not be touched
             HttpHeaderNames.ContentLength => ResponseHeaderType.None,
             // These headers belong to Content

@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 using EmbedIO.Actions;
 using EmbedIO.Tests.TestObjects;
 using EmbedIO.WebApi;
-using NUnit.Framework;
 using Swan;
 using Swan.Formatters;
+using NUnit.Framework;
 
 namespace EmbedIO.Tests
 {
@@ -20,7 +20,7 @@ namespace EmbedIO.Tests
         private const string Prefix = "http://localhost:9696";
 
         private static string[] GetMultiplePrefixes()
-            => new[] { "http://localhost:9696", "http://localhost:9697", "http://localhost:9698" };
+            =>["http://localhost:9696", "http://localhost:9697", "http://localhost:9698"];
 
         public class Constructors : WebServerTest
         {
@@ -28,29 +28,29 @@ namespace EmbedIO.Tests
             public void DefaultConstructor()
             {
                 var instance = new WebServer();
-                Assert.IsNotNull(instance.Listener, "It has a HttpListener");
+                NUnit.Framework.Legacy.ClassicAssert.IsNotNull(instance.Listener, "It has a HttpListener");
             }
 
             [Test]
             public void ConstructorWithPort()
             {
                 var instance = new WebServer(Port);
-                Assert.IsNotNull(instance.Listener, "It has a HttpListener");
+                NUnit.Framework.Legacy.ClassicAssert.IsNotNull(instance.Listener, "It has a HttpListener");
             }
 
             [Test]
             public void ConstructorWithSinglePrefix()
             {
                 var instance = new WebServer(Prefix);
-                Assert.IsNotNull(instance.Listener, "It has a HttpListener");
+                NUnit.Framework.Legacy.ClassicAssert.IsNotNull(instance.Listener, "It has a HttpListener");
             }
 
             [Test]
             public void ConstructorWithMultiplePrefixes()
             {
                 var instance = new WebServer(GetMultiplePrefixes());
-                Assert.IsNotNull(instance.Listener, "It has a HttpListener");
-                Assert.AreEqual(3, instance.Listener.Prefixes.Count);
+                NUnit.Framework.Legacy.ClassicAssert.IsNotNull(instance.Listener, "It has a HttpListener");
+                NUnit.Framework.Legacy.ClassicAssert.AreEqual(3, instance.Listener.Prefixes.Count);
             }
         }
 
@@ -62,13 +62,13 @@ namespace EmbedIO.Tests
                 var instance = new WebServer("http://localhost:9696");
 
                 var cts = new CancellationTokenSource();
-                var task = instance.RunAsync(cts.Token);
+                Task task = instance.RunAsync(cts.Token);
                 cts.Cancel();
 
                 task.Await();
                 instance.Dispose();
 
-                Assert.IsTrue(task.IsCompleted);
+                NUnit.Framework.Legacy.ClassicAssert.IsTrue(task.IsCompleted);
             }
         }
 
@@ -80,7 +80,7 @@ namespace EmbedIO.Tests
                 var instance = new WebServer();
                 instance.Modules.Add(nameof(WebApiModule), new WebApiModule("/"));
 
-                Assert.AreEqual(instance.Modules.Count, 1, "It has one module");
+                NUnit.Framework.Legacy.ClassicAssert.AreEqual(instance.Modules.Count, 1, "It has one module");
             }
         }
 
@@ -167,13 +167,13 @@ namespace EmbedIO.Tests
                         MimeType.Json),
                 };
 
-                using var response = await client.SendAsync(request);
+                using HttpResponseMessage response = await client.SendAsync(request);
                 var data = await response.Content.ReadAsStringAsync();
-                Assert.IsNotNull(data, "Data is not empty");
-                var model = Json.Deserialize<EncodeCheck>(data);
+                NUnit.Framework.Legacy.ClassicAssert.IsNotNull(data, "Data is not empty");
+                EncodeCheck model = Json.Deserialize<EncodeCheck>(data);
 
-                Assert.IsNotNull(model);
-                Assert.IsTrue(model.IsValid);
+                NUnit.Framework.Legacy.ClassicAssert.IsNotNull(model);
+                NUnit.Framework.Legacy.ClassicAssert.IsTrue(model.IsValid);
             }
 
             internal class EncodeCheck

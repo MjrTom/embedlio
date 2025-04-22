@@ -14,27 +14,22 @@ namespace EmbedIO.Routing
     /// <typeparam name="TData">The type of the data used to select a suitable handler
     /// for the context.</typeparam>
     /// <seealso cref="ConfiguredObject" />
-    public abstract class RouteResolverBase<TData> : ConfiguredObject
+    /// <remarks>
+    /// Initializes a new instance of the <see cref="RouteResolverBase{TData}"/> class.
+    /// </remarks>
+    /// <param name="matcher">The <see cref="RouteMatcher"/> to match URL paths against.</param>
+    /// <exception cref="ArgumentNullException">
+    /// <para><paramref name="matcher"/> is <see langword="null"/>.</para>
+    /// </exception>
+    public abstract class RouteResolverBase<TData>(RouteMatcher matcher) : ConfiguredObject
     {
         private readonly List<(TData data, RouteHandlerCallback handler)> _dataHandlerPairs
-            = new List<(TData data, RouteHandlerCallback handler)>();
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="RouteResolverBase{TData}"/> class.
-        /// </summary>
-        /// <param name="matcher">The <see cref="RouteMatcher"/> to match URL paths against.</param>
-        /// <exception cref="ArgumentNullException">
-        /// <para><paramref name="matcher"/> is <see langword="null"/>.</para>
-        /// </exception>
-        protected RouteResolverBase(RouteMatcher matcher)
-        {
-            Matcher = Validate.NotNull(nameof(matcher), matcher);
-        }
+            = new();
 
         /// <summary>
         /// Gets the <see cref="RouteMatcher"/> used to match routes.
         /// </summary>
-        public RouteMatcher Matcher { get; }
+        public RouteMatcher Matcher { get; } = Validate.NotNull(nameof(matcher), matcher);
 
         /// <summary>
         /// Gets the route this resolver matches URL paths against.
@@ -89,10 +84,12 @@ namespace EmbedIO.Routing
             EnsureConfigurationNotLocked();
 
             handler = Validate.NotNull(nameof(handler), handler);
-            _dataHandlerPairs.Add((data, (ctx, route) => {
+            _dataHandlerPairs.Add((data, (ctx, route) =>
+            {
                 handler(ctx, route);
                 return Task.CompletedTask;
-            }));
+            }
+            ));
         }
 
         /// <summary>
@@ -117,13 +114,13 @@ namespace EmbedIO.Routing
         {
             LockConfiguration();
 
-            var match = Matcher.Match(context.RequestedPath);
+            RouteMatch? match = Matcher.Match(context.RequestedPath);
             if (match == null)
                 return RouteResolutionResult.RouteNotMatched;
 
-            var contextData = GetContextData(context);
-            var result = RouteResolutionResult.NoHandlerSelected;
-            foreach (var (data, handler) in _dataHandlerPairs)
+            TData? contextData = GetContextData(context);
+            RouteResolutionResult result = RouteResolutionResult.NoHandlerSelected;
+            foreach ((TData data, RouteHandlerCallback handler) in _dataHandlerPairs)
             {
                 if (!MatchContextData(contextData, data))
                     continue;

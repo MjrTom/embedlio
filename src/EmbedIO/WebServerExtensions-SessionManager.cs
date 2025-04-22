@@ -3,7 +3,7 @@ using EmbedIO.Sessions;
 
 namespace EmbedIO
 {
-    partial class WebServerExtensions
+    static partial class WebServerExtensions
     {
         /// <summary>
         /// Sets the session manager on an <see cref="IWebServer"/>.

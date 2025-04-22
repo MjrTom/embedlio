@@ -1,4 +1,5 @@
 ﻿using EmbedIO.Utilities;
+
 using NUnit.Framework;
 
 namespace EmbedIO.Tests.Issues
@@ -9,15 +10,15 @@ namespace EmbedIO.Tests.Issues
         public void QValueList_TryNegotiateContentEncoding_WhenPreferCompressionFalse_OnNoCompressionSpecified_ReturnsTrue()
         {
             var list = new QValueList(true, "gzip, deflate");
-            Assert.IsTrue(list.TryNegotiateContentEncoding(false, out _, out _));
+            NUnit.Framework.Legacy.ClassicAssert.IsTrue(list.TryNegotiateContentEncoding(false, out _, out _));
         }
 
         [Test]
         public void QValueList_TryNegotiateContentEncoding_WhenPreferCompressionFalse_OnNoCompressionSpecified_YieldsNone()
         {
             var list = new QValueList(true, "gzip, deflate");
-            list.TryNegotiateContentEncoding(false, out var compressionMethod, out _);
-            Assert.AreEqual(CompressionMethod.None, compressionMethod);
+            list.TryNegotiateContentEncoding(false, out CompressionMethod compressionMethod, out _);
+            NUnit.Framework.Legacy.ClassicAssert.AreEqual(CompressionMethod.None, compressionMethod);
         }
 
         [Test]
@@ -25,7 +26,7 @@ namespace EmbedIO.Tests.Issues
         {
             var list = new QValueList(true, "gzip, deflate");
             list.TryNegotiateContentEncoding(false, out _, out var name);
-            Assert.AreEqual(CompressionMethodNames.None, name);
+            NUnit.Framework.Legacy.ClassicAssert.AreEqual(CompressionMethodNames.None, name);
         }
     }
 }

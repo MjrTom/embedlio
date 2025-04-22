@@ -42,7 +42,8 @@ namespace EmbedIO
         /// <returns>A <see cref="ResponseSerializerCallback"/> that can be used to serialize
         /// data to a HTTP response.</returns>
         public static ResponseSerializerCallback Json(JsonSerializerCase jsonSerializerCase)
-            => async (context, data) => {
+            => async (context, data) =>
+            {
                 context.Response.ContentType = MimeType.Json;
                 context.Response.ContentEncoding = WebServer.Utf8NoBomEncoding;
                 await ChunkedEncodingBaseSerializer(context, Swan.Formatters.Json.Serialize(data, jsonSerializerCase))
@@ -62,8 +63,9 @@ namespace EmbedIO
         public static ResponseSerializerCallback Json(SerializerOptions serializerOptions)
         {
             _ = Validate.NotNull(nameof(serializerOptions), serializerOptions);
-            
-            return async (context, data) => {
+
+            return async (context, data) =>
+            {
                 context.Response.ContentType = MimeType.Json;
                 context.Response.ContentEncoding = WebServer.Utf8NoBomEncoding;
                 await ChunkedEncodingBaseSerializer(context, Swan.Formatters.Json.Serialize(data, serializerOptions))
@@ -80,10 +82,11 @@ namespace EmbedIO
         /// <returns>A <see cref="ResponseSerializerCallback"/> that can be used to serialize
         /// data to a HTTP response.</returns>
         public static ResponseSerializerCallback Json(bool bufferResponse)
-            => async (context, data) => {
+            => async (context, data) =>
+            {
                 context.Response.ContentType = MimeType.Json;
                 context.Response.ContentEncoding = WebServer.Utf8NoBomEncoding;
-                var baseSerializer = None(bufferResponse);
+                ResponseSerializerCallback baseSerializer = None(bufferResponse);
                 await baseSerializer(context, Swan.Formatters.Json.Serialize(data))
                     .ConfigureAwait(false);
             };
@@ -99,10 +102,11 @@ namespace EmbedIO
         /// <returns>A <see cref="ResponseSerializerCallback"/> that can be used to serialize
         /// data to a HTTP response.</returns>
         public static ResponseSerializerCallback Json(bool bufferResponse, JsonSerializerCase jsonSerializerCase)
-            => async (context, data) => {
+            => async (context, data) =>
+            {
                 context.Response.ContentType = MimeType.Json;
                 context.Response.ContentEncoding = WebServer.Utf8NoBomEncoding;
-                var baseSerializer = None(bufferResponse);
+                ResponseSerializerCallback baseSerializer = None(bufferResponse);
                 await baseSerializer(context, Swan.Formatters.Json.Serialize(data, jsonSerializerCase))
                     .ConfigureAwait(false);
             };
@@ -123,11 +127,12 @@ namespace EmbedIO
         public static ResponseSerializerCallback Json(bool bufferResponse, SerializerOptions serializerOptions)
         {
             _ = Validate.NotNull(nameof(serializerOptions), serializerOptions);
-            
-            return async (context, data) => {
+
+            return async (context, data) =>
+            {
                 context.Response.ContentType = MimeType.Json;
                 context.Response.ContentEncoding = WebServer.Utf8NoBomEncoding;
-                var baseSerializer = None(bufferResponse);
+                ResponseSerializerCallback baseSerializer = None(bufferResponse);
                 await baseSerializer(context, Swan.Formatters.Json.Serialize(data, serializerOptions))
                     .ConfigureAwait(false);
             };
@@ -151,7 +156,8 @@ namespace EmbedIO
             => bufferResponse ? BufferingBaseSerializer : ChunkedEncodingBaseSerializer;
 
         private static ResponseSerializerCallback GetBaseSerializer(bool bufferResponse)
-            => async (context, data) => {
+            => async (context, data) =>
+            {
                 if (data is null)
                 {
                     return;
@@ -167,13 +173,13 @@ namespace EmbedIO
                 if (isBinaryResponse)
                 {
                     var responseBytes = (byte[])data;
-                    using var stream = context.OpenResponseStream(bufferResponse, preferCompression);
+                    using System.IO.Stream stream = context.OpenResponseStream(bufferResponse, preferCompression);
                     await stream.WriteAsync(responseBytes, 0, responseBytes.Length).ConfigureAwait(false);
                 }
                 else
                 {
                     var responseString = data is string stringData ? stringData : data.ToString() ?? string.Empty;
-                    using var text = context.OpenResponseText(context.Response.ContentEncoding, bufferResponse, preferCompression);
+                    using System.IO.TextWriter text = context.OpenResponseText(context.Response.ContentEncoding, bufferResponse, preferCompression);
                     await text.WriteAsync(responseString).ConfigureAwait(false);
                 }
             };

@@ -22,7 +22,7 @@ namespace EmbedIO.Net.Internal
             Secure = secure;
             _endpoint = new IPEndPoint(address, port);
             _sock = new Socket(address.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-            
+
             if (address.AddressFamily == AddressFamily.InterNetworkV6 && EndPointManager.UseIpv6)
             {
                 _sock.SetSocketOption(SocketOptionLevel.IPv6, SocketOptionName.IPv6Only, false);
@@ -44,8 +44,8 @@ namespace EmbedIO.Net.Internal
 
         public bool BindContext(HttpListenerContext context)
         {
-            var req = context.Request;
-            var listener = SearchListener(req.Url, out var prefix);
+            IHttpRequest req = context.Request;
+            HttpListener? listener = SearchListener(req.Url, out ListenerPrefix? prefix);
 
             if (listener == null)
             {
@@ -57,7 +57,7 @@ namespace EmbedIO.Net.Internal
             return true;
         }
 
-        public void UnbindContext(HttpListenerContext context) => context.Listener.UnregisterContext(context);
+        public static void UnbindContext(HttpListenerContext context) => context.Listener.UnregisterContext(context);
 
         public void Dispose()
         {
@@ -71,7 +71,7 @@ namespace EmbedIO.Net.Internal
                 _unregistered.Clear();
             }
 
-            foreach (var c in connections)
+            foreach (HttpConnection c in connections)
             {
                 c.Dispose();
             }
@@ -176,7 +176,7 @@ namespace EmbedIO.Net.Internal
             do
             {
                 prefs = _prefixes;
-                var prefixKey = _prefixes.Keys.FirstOrDefault(p => p.Path == prefix.Path);
+                ListenerPrefix? prefixKey = _prefixes.Keys.FirstOrDefault(p => p.Path == prefix.Path);
 
                 if (prefixKey is null)
                 {
@@ -282,7 +282,7 @@ namespace EmbedIO.Net.Internal
             HttpListener? bestMatch = null;
             var bestLength = -1;
 
-            foreach (var p in list)
+            foreach (ListenerPrefix p in list)
             {
                 if (p.Path.Length < bestLength || !path.StartsWith(p.Path, StringComparison.Ordinal))
                 {
@@ -352,9 +352,9 @@ namespace EmbedIO.Net.Internal
 
             if (!string.IsNullOrEmpty(host))
             {
-                var result = _prefixes;
+                Dictionary<ListenerPrefix, HttpListener> result = _prefixes;
 
-                foreach (var p in result.Keys)
+                foreach (ListenerPrefix p in result.Keys)
                 {
                     if (p.Path.Length < bestLength)
                     {
@@ -382,7 +382,7 @@ namespace EmbedIO.Net.Internal
                 }
             }
 
-            var list = _unhandled;
+            List<ListenerPrefix>? list = _unhandled;
             bestMatch = MatchFromList(path, list, out prefix);
             if (path != pathSlash && bestMatch == null)
             {
@@ -411,7 +411,7 @@ namespace EmbedIO.Net.Internal
                 return;
             }
 
-            var list = _unhandled;
+            List<ListenerPrefix>? list = _unhandled;
             if (list != null && list.Count > 0)
             {
                 return;

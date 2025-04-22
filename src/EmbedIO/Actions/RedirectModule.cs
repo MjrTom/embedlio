@@ -64,7 +64,7 @@ namespace EmbedIO.Actions
             RedirectUrl = Validate.Url(nameof(redirectUrl), redirectUrl);
 
             var status = (int)statusCode;
-            if (status < 300 || status > 399)
+            if (status is < 300 or > 399)
                 throw new ArgumentException("Status code does not imply a redirection.", nameof(statusCode));
 
             StatusCode = statusCode;

@@ -4,7 +4,7 @@ using System.Security;
 
 namespace EmbedIO.Utilities
 {
-    partial class Validate
+    static partial class Validate
     {
         private static readonly char[] InvalidLocalPathChars = GetInvalidLocalPathChars();
 
@@ -27,7 +27,7 @@ namespace EmbedIO.Utilities
         /// <seealso cref="Utilities.UrlPath.Normalize"/>
         public static string UrlPath(string argumentName, string value, bool isBasePath)
         {
-            var exception = Utilities.UrlPath.ValidateInternal(argumentName, value);
+            Exception? exception = Utilities.UrlPath.ValidateInternal(argumentName, value);
             if (exception != null)
                 throw exception;
 
@@ -72,7 +72,7 @@ namespace EmbedIO.Utilities
                 {
                     value = Path.GetFullPath(value);
                 }
-                catch (Exception e) when (e is ArgumentException || e is SecurityException || e is NotSupportedException || e is PathTooLongException)
+                catch (Exception e) when (e is ArgumentException or SecurityException or NotSupportedException or PathTooLongException)
                 {
                     throw new ArgumentException("Could not get the full local path.", argumentName, e);
                 }

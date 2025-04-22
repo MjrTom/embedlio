@@ -1,5 +1,5 @@
-﻿using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+
 using EmbedIO.Routing;
 using EmbedIO.Sessions;
 using EmbedIO.WebApi;

@@ -25,24 +25,24 @@ namespace EmbedIO.Samples
             await Task.Delay(0).ConfigureAwait(false);
 
             return new List<Person> {
-                new Person {
+                new() {
                     Id = 1,
                     Name = "Mario Di Vece",
                     Age = 31,
-                    EmailAddress = "mario@unosquare.com"
+                    EmailAddress = "mario@unosquare.com",
                 },
-                new Person {
+                new() {
                     Id = 2,
                     Name = "Geovanni Perez",
                     Age = 32,
-                    EmailAddress = "geovanni.perez@unosquare.com"
+                    EmailAddress = "geovanni.perez@unosquare.com",
                 },
-                new Person {
+                new() {
                     Id = 3,
                     Name = "Luis Gonzalez",
                     Age = 29,
                     EmailAddress = "luis.gonzalez@unosquare.com"
-                }
+                },
             };
         }
     }

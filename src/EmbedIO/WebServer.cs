@@ -149,7 +149,7 @@ namespace EmbedIO
         {
             while (!cancellationToken.IsCancellationRequested && (Listener?.IsListening ?? false))
             {
-                var context = await Listener.GetContextAsync(cancellationToken).ConfigureAwait(false);
+                IHttpContextImpl context = await Listener.GetContextAsync(cancellationToken).ConfigureAwait(false);
                 context.CancellationToken = cancellationToken;
                 context.Route = RouteMatch.UnsafeFromRoot(UrlPath.Normalize(context.Request.Url.AbsolutePath, false));
 
@@ -164,21 +164,23 @@ namespace EmbedIO
 
         private IHttpListener CreateHttpListener()
         {
-            IHttpListener DoCreate() => Options.Mode switch {
-                HttpListenerMode.Microsoft => System.Net.HttpListener.IsSupported 
-                    ? new SystemHttpListener(new System.Net.HttpListener()) as IHttpListener 
+            IHttpListener DoCreate() => Options.Mode switch
+            {
+                HttpListenerMode.Microsoft => System.Net.HttpListener.IsSupported
+                    ? new SystemHttpListener(new System.Net.HttpListener())
                     : new Net.HttpListener(Options.Certificate),
                 _ => new Net.HttpListener(Options.Certificate)
             };
 
-            var listener = DoCreate();
+            IHttpListener listener = DoCreate();
             $"Running HTTPListener: {listener.Name}".Info(LogSource);
 
             foreach (var prefix in Options.UrlPrefixes)
             {
                 var urlPrefix = new string(prefix?.ToCharArray());
 
-                if (!urlPrefix.EndsWith("/")) urlPrefix += "/";
+                if (!urlPrefix.EndsWith("/"))
+                    urlPrefix += "/";
                 urlPrefix = urlPrefix.ToLowerInvariant();
 
                 listener.AddPrefix(urlPrefix);

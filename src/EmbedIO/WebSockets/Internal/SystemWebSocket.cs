@@ -5,19 +5,14 @@ using System.Threading.Tasks;
 
 namespace EmbedIO.WebSockets.Internal
 {
-    internal sealed class SystemWebSocket : IWebSocket
+    internal sealed class SystemWebSocket(System.Net.WebSockets.WebSocket webSocket) : IWebSocket
     {
-        public SystemWebSocket(System.Net.WebSockets.WebSocket webSocket)
-        {
-            UnderlyingWebSocket = webSocket;
-        }
-
         ~SystemWebSocket()
         {
             Dispose(false);
         }
 
-        public System.Net.WebSockets.WebSocket UnderlyingWebSocket { get; }
+        public System.Net.WebSockets.WebSocket UnderlyingWebSocket { get; } = webSocket;
 
         public WebSocketState State => UnderlyingWebSocket.State;
 
@@ -40,18 +35,11 @@ namespace EmbedIO.WebSockets.Internal
             UnderlyingWebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, cancellationToken);
 
         /// <inheritdoc />
-        public Task CloseAsync(CloseStatusCode code, string? comment = null, CancellationToken cancellationToken = default)=>
-            UnderlyingWebSocket.CloseAsync(MapCloseStatus(code), comment ?? string.Empty, cancellationToken);
+        public Task CloseAsync(CloseStatusCode code, string? comment = null, CancellationToken cancellationToken = default) =>
+            UnderlyingWebSocket.CloseAsync(SystemWebSocket.MapCloseStatus(code), comment ?? string.Empty, cancellationToken);
 
-        private void Dispose(bool disposing)
+        private static WebSocketCloseStatus MapCloseStatus(CloseStatusCode code) => code switch
         {
-            if (!disposing)
-                return;
-
-            UnderlyingWebSocket.Dispose();
-        }
-
-        private WebSocketCloseStatus MapCloseStatus(CloseStatusCode code) => code switch {
             CloseStatusCode.Normal => WebSocketCloseStatus.NormalClosure,
             CloseStatusCode.ProtocolError => WebSocketCloseStatus.ProtocolError,
             CloseStatusCode.InvalidData => WebSocketCloseStatus.InvalidPayloadData,
@@ -62,5 +50,13 @@ namespace EmbedIO.WebSockets.Internal
             CloseStatusCode.ServerError => WebSocketCloseStatus.InternalServerError,
             _ => throw new ArgumentOutOfRangeException(nameof(code), code, null)
         };
+
+        private void Dispose(bool disposing)
+        {
+            if (!disposing)
+                return;
+
+            UnderlyingWebSocket.Dispose();
+        }
     }
 }

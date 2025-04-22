@@ -10,18 +10,13 @@ namespace EmbedIO.Net.Internal
     /// Represents a wrapper for <c>System.Net.CookieCollection</c>.
     /// </summary>
     /// <seealso cref="ICookieCollection" />
-    internal sealed class SystemCookieCollection : ICookieCollection
+    /// <remarks>
+    /// Initializes a new instance of the <see cref="SystemCookieCollection"/> class.
+    /// </remarks>
+    /// <param name="collection">The cookie collection.</param>
+    internal sealed class SystemCookieCollection(CookieCollection collection) : ICookieCollection
     {
-        private readonly CookieCollection _collection;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="SystemCookieCollection"/> class.
-        /// </summary>
-        /// <param name="collection">The cookie collection.</param>
-        public SystemCookieCollection(CookieCollection collection)
-        {
-            _collection = collection;
-        }
+        private readonly CookieCollection _collection = collection;
 
         /// <inheritdoc />
         public int Count => _collection.Count;

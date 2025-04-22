@@ -31,7 +31,7 @@ namespace EmbedIO.Tests.Issues
             // because the handler compiler would pass (System.Object)null
             // instead of (System.String)null for parameter str.
             [Route(HttpVerbs.Get, "/")]
-            public void GiveMeTheDefaultValueForString(string str)
+            public static void GiveMeTheDefaultValueForString(string str)
             {
             }
         }

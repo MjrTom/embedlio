@@ -2,7 +2,7 @@
 
 namespace EmbedIO.Routing
 {
-    partial class RoutingModuleExtensions
+    static partial class RoutingModuleExtensions
     {
         /// <summary>
         /// Adds a handler to a <see cref="RoutingModule"/>.

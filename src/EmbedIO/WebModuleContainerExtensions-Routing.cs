@@ -4,7 +4,7 @@ using System;
 
 namespace EmbedIO
 {
-    partial class WebModuleContainerExtensions
+    static partial class WebModuleContainerExtensions
     {
         /// <summary>
         /// Creates an instance of <see cref="RoutingModule"/> and adds it to a module container.

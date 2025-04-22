@@ -65,9 +65,13 @@ namespace EmbedIO.Testing
             if (string.IsNullOrEmpty(path))
                 return false;
 
+            var resourceName = ConvertPath(path);
+            if (resourceName == null)
+                return false;
+
             try
             {
-                stream = Assembly.GetManifestResourceStream(ConvertPath(path));
+                stream = Assembly.GetManifestResourceStream(resourceName);
                 return true;
             }
             catch (FileNotFoundException)
@@ -85,8 +89,10 @@ namespace EmbedIO.Testing
         /// <exception cref="ArgumentNullException"><paramref name="path"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentException"><paramref name="path"/> is an empty string.</exception>
         /// <exception cref="FileNotFoundException"><paramref name="path"/> is an empty string.</exception>
-        public static Stream Open(string path)
-            => Assembly.GetManifestResourceStream(ConvertPath(Validate.NotNullOrEmpty(nameof(path), path)));
+        public static Stream? Open(string path)
+            => ConvertPath(Validate.NotNullOrEmpty(nameof(path), path)) is string resourceName
+                ? Assembly.GetManifestResourceStream(resourceName)
+                : null;
 
         /// <summary>
         /// Gets the length of a resource, expressed in bytes.
@@ -98,7 +104,7 @@ namespace EmbedIO.Testing
         /// <exception cref="FileNotFoundException"><paramref name="path"/> is an empty string.</exception>
         public static long GetLength(string path)
         {
-            using var stream = Open(path);
+            using Stream? stream = Open(path);
             return stream.Length;
         }
 
@@ -112,10 +118,10 @@ namespace EmbedIO.Testing
         /// <exception cref="FileNotFoundException"><paramref name="path"/> is an empty string.</exception>
         public static byte[] GetBytes(string path)
         {
-            using var stream = Open(path);
+            using Stream? stream = Open(path);
             var length = (int)stream.Length;
             if (length == 0)
-                return Array.Empty<byte>();
+                return [];
 
             var buffer = new byte[length];
             stream.Read(buffer, 0, length);
@@ -139,7 +145,7 @@ namespace EmbedIO.Testing
         /// <exception cref="FileNotFoundException"><paramref name="path"/> is an empty string.</exception>
         public static byte[]? GetByteRange(string path, int start, int upperBound)
         {
-            using var stream = Open(path);
+            using Stream? stream = Open(path);
             var length = (int) stream.Length;
             if (start >= length || upperBound < start || upperBound >= length)
                 return null;
@@ -164,7 +170,7 @@ namespace EmbedIO.Testing
         /// <exception cref="FileNotFoundException"><paramref name="path"/> is an empty string.</exception>
         public static string GetText(string path, Encoding? encoding = null)
         {
-            using var stream = Open(path);
+            using Stream? stream = Open(path);
             using var reader = new StreamReader(stream, encoding ?? WebServer.DefaultEncoding, false, WebServer.StreamCopyBufferSize, true);
             return reader.ReadToEnd();
         }

@@ -19,9 +19,9 @@ namespace EmbedIO.Net.Internal
     {
         private readonly System.Net.HttpListenerContext _context;
 
-        private readonly TimeKeeper _ageKeeper = new ();
+        private readonly TimeKeeper _ageKeeper = new();
 
-        private readonly Stack<Action<IHttpContext>> _closeCallbacks = new ();
+        private readonly Stack<Action<IHttpContext>> _closeCallbacks = new();
 
         private bool _closed;
 
@@ -38,7 +38,7 @@ namespace EmbedIO.Net.Internal
             Route = RouteMatch.None;
             Session = SessionProxy.None;
         }
-        
+
         public string Id { get; }
 
         public CancellationToken CancellationToken { get; set; }
@@ -88,7 +88,7 @@ namespace EmbedIO.Net.Internal
             TimeSpan keepAliveInterval,
             CancellationToken cancellationToken)
         {
-            var context = await _context.AcceptWebSocketAsync(
+            System.Net.WebSockets.HttpListenerWebSocketContext context = await _context.AcceptWebSocketAsync(
                 acceptedProtocol.NullIfEmpty(), // Empty string would throw; use null to signify "no subprotocol" here.
                 receiveBufferSize,
                 keepAliveInterval)
@@ -103,7 +103,7 @@ namespace EmbedIO.Net.Internal
             // Always close the response stream no matter what.
             Response.Close();
 
-            foreach (var callback in _closeCallbacks)
+            foreach (Action<IHttpContext> callback in _closeCallbacks)
             {
                 try
                 {

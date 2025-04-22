@@ -35,7 +35,7 @@ namespace EmbedIO.Testing.Internal
         public byte[]? Body { get; private set; }
 
         public string? StatusDescription { get; set; }
-        
+
         internal bool IsClosed { get; private set; }
 
         public void SetCookie(Cookie cookie) => Cookies.Add(cookie);

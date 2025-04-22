@@ -28,7 +28,7 @@ namespace EmbedIO
         /// <remarks>
         /// <para>If this property is <see langword="true" />, a HTTP context's
         /// <see cref="IHttpContext.SetHandled" /> method will be automatically called
-        /// immediately after after the <see cref="Task" /> returned by
+        /// immediately after the <see cref="Task" /> returned by
         /// <see cref="HandleRequestAsync" /> is completed. This will prevent
         /// the context from being passed further along to other modules.</para>
         /// </remarks>
@@ -69,7 +69,7 @@ namespace EmbedIO
         /// <param name="urlPath">The URL path to match.</param>
         /// <returns>If the match is successful, a <see cref="RouteMatch"/> object;
         /// otherwise, <see langword="null"/>.</returns>
-        RouteMatch MatchUrlPath(string urlPath);
+        RouteMatch? MatchUrlPath(string urlPath);
 
         /// <summary>
         /// Handles a request from a client.

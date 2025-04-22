@@ -8,8 +8,8 @@ namespace EmbedIO.Files
     {
         internal class Section
         {
-            private readonly object _syncRoot = new object();
-            private readonly Dictionary<string, FileCacheItem> _items = new Dictionary<string, FileCacheItem>(StringComparer.Ordinal);
+            private readonly object _syncRoot = new();
+            private readonly Dictionary<string, FileCacheItem> _items = new(StringComparer.Ordinal);
             private long _totalSize;
             private string? _oldestKey;
             private string? _newestKey;
@@ -42,7 +42,7 @@ namespace EmbedIO.Files
             {
                 lock (_syncRoot)
                 {
-                    if (!_items.TryGetValue(path, out item))
+                    if (!_items.TryGetValue(path, out item!))
                         return false;
 
                     RefreshItemCore(path, item);
@@ -111,7 +111,7 @@ namespace EmbedIO.Files
             // Removes an item.
             private void RemoveItemCore(string path)
             {
-                if (!_items.TryGetValue(path, out var item))
+                if (!_items.TryGetValue(path, out FileCacheItem? item))
                     return;
 
                 if (_oldestKey == path)
@@ -141,7 +141,7 @@ namespace EmbedIO.Files
                 if (path == null)
                     return 0;
 
-                var item = _items[path];
+                FileCacheItem item = _items[path];
 
                 if ((_oldestKey = item.NextKey) != null)
                     _items[_oldestKey].PreviousKey = null;

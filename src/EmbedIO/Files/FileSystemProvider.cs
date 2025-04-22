@@ -191,7 +191,7 @@ namespace EmbedIO.Files
         private static MappedResourceInfo GetMappedResourceInfo(IMimeTypeProvider mimeTypeProvider, FileSystemInfo info)
             => info is DirectoryInfo directoryInfo
                 ? GetMappedDirectoryInfo(directoryInfo)
-                : GetMappedFileInfo(mimeTypeProvider, (FileInfo) info);
+                : GetMappedFileInfo(mimeTypeProvider, (FileInfo)info);
 
         private void Watcher_ChangedOrDeleted(object sender, FileSystemEventArgs e)
             => ResourceChanged?.Invoke(e.FullPath);

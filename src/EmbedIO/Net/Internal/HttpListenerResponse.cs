@@ -119,7 +119,7 @@ namespace EmbedIO.Net.Internal
             set
             {
                 EnsureCanChangeHeaders();
-                if (value < 100 || value > 999)
+                if (value is < 100 or > 999)
                 {
                     throw new ArgumentOutOfRangeException(nameof(StatusCode), "StatusCode must be between 100 and 999.");
                 }
@@ -139,7 +139,7 @@ namespace EmbedIO.Net.Internal
         }
 
         internal bool HeadersSent { get; set; }
-        
+
         void IDisposable.Dispose() => Close(true);
 
         public void Close()
@@ -210,7 +210,7 @@ namespace EmbedIO.Net.Internal
                                      && Headers.ContainsKey(HttpHeaderNames.ContentLength)
                                      && long.TryParse(Headers[HttpHeaderNames.ContentLength], out var contentLength)
                                      && contentLength >= 0L;
-            
+
                 if (!haveContentLength)
                 {
                     Headers.Remove(HttpHeaderNames.ContentLength);
@@ -235,7 +235,8 @@ namespace EmbedIO.Net.Internal
             //// HttpStatusCode.InternalServerError   500
             //// HttpStatusCode.ServiceUnavailable    503        
             var reuses = _connection.Reuses;
-            var keepAlive = _statusCode switch {
+            var keepAlive = _statusCode switch
+            {
                 400 => false,
                 408 => false,
                 411 => false,
@@ -329,7 +330,7 @@ namespace EmbedIO.Net.Internal
 
         private string GetHeaderData()
         {
-            var sb = new StringBuilder()
+            StringBuilder sb = new StringBuilder()
                 .Append("HTTP/")
                 .Append(ProtocolVersion)
                 .Append(' ')
@@ -349,7 +350,7 @@ namespace EmbedIO.Net.Internal
 
             if (_cookies != null)
             {
-                foreach (var cookie in _cookies)
+                foreach (Cookie cookie in _cookies)
                 {
                     AppendSetCookieHeader(sb, cookie);
                 }
@@ -357,7 +358,7 @@ namespace EmbedIO.Net.Internal
 
             if (Headers.ContainsKey(HttpHeaderNames.SetCookie))
             {
-                foreach (var cookie in CookieList.Parse(Headers[HttpHeaderNames.SetCookie]))
+                foreach (Cookie cookie in CookieList.Parse(Headers![HttpHeaderNames.SetCookie]))
                 {
                     AppendSetCookieHeader(sb, cookie);
                 }

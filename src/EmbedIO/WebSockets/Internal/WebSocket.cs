@@ -22,9 +22,9 @@ namespace EmbedIO.WebSockets.Internal
     internal sealed class WebSocket : IWebSocket
     {
         public const string SupportedVersion = "13";
-        
-        private readonly object _stateSyncRoot = new ();
-        private readonly ConcurrentQueue<MessageEventArgs> _messageEventQueue = new ();
+
+        private readonly object _stateSyncRoot = new();
+        private readonly ConcurrentQueue<MessageEventArgs> _messageEventQueue = new();
         private readonly Action _closeConnection;
         private readonly TimeSpan _waitTime = TimeSpan.FromSeconds(1);
 
@@ -160,7 +160,7 @@ namespace EmbedIO.WebSockets.Internal
         /// <param name="opcode">The opcode.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>
-        /// A task that represents the asynchronous of send 
+        /// A task that represents the asynchronous of send
         /// binary data using websocket.
         /// </returns>
 #pragma warning disable CA1801 // Unused parameter
@@ -173,7 +173,7 @@ namespace EmbedIO.WebSockets.Internal
             }
 
             using var stream = new WebSocketStream(data, opcode, Compression);
-            foreach (var frame in stream.GetFrames())
+            foreach (WebSocketFrame frame in stream.GetFrames())
             {
                 await Send(frame).ConfigureAwait(false);
             }
@@ -192,14 +192,14 @@ namespace EmbedIO.WebSockets.Internal
             {
                 const string Guid = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
 
-                var buff = new StringBuilder(clientKey, 64).Append(Guid);
+                StringBuilder buff = new StringBuilder(clientKey, 64).Append(Guid);
 #pragma warning disable CA5350 // Do Not Use Weak Cryptographic Algorithms
                 using var sha1 = SHA1.Create();
                 return Convert.ToBase64String(sha1.ComputeHash(Encoding.UTF8.GetBytes(buff.ToString())));
 #pragma warning restore CA5350 // Do Not Use Weak Cryptographic Algorithms
             }
 
-            var requestHeaders = httpContext.Request.Headers;
+            System.Collections.Specialized.NameValueCollection requestHeaders = httpContext.Request.Headers;
 
             var webSocketKey = requestHeaders[HttpHeaderNames.SecWebSocketKey];
 
@@ -209,8 +209,8 @@ namespace EmbedIO.WebSockets.Internal
             }
 
             var webSocketVersion = requestHeaders[HttpHeaderNames.SecWebSocketVersion];
-            
-            if (webSocketVersion == null || webSocketVersion != SupportedVersion)
+
+            if (webSocketVersion is null or not SupportedVersion)
             {
                 throw new WebSocketException(CloseStatusCode.ProtocolError, $"Includes no {HttpHeaderNames.SecWebSocketVersion} header, or it has an invalid value.");
             }
@@ -248,10 +248,10 @@ namespace EmbedIO.WebSockets.Internal
         }
 
         private static bool IsOpcodeReserved(CloseStatusCode code)
-            => code == CloseStatusCode.Undefined
-            || code == CloseStatusCode.NoStatus
-            || code == CloseStatusCode.Abnormal
-            || code == CloseStatusCode.TlsHandshakeFailure;
+            => code is CloseStatusCode.Undefined
+            or CloseStatusCode.NoStatus
+            or CloseStatusCode.Abnormal
+            or CloseStatusCode.TlsHandshakeFailure;
 
 #pragma warning disable CA1801 // Unused parameter
         private void Dispose(bool disposing)
@@ -275,7 +275,7 @@ namespace EmbedIO.WebSockets.Internal
         {
             lock (_stateSyncRoot)
             {
-                if (_readyState == WebSocketState.CloseReceived || _readyState == WebSocketState.CloseSent)
+                if (_readyState is WebSocketState.CloseReceived or WebSocketState.CloseSent)
                 {
                     "The closing is already in progress.".Trace(nameof(InternalCloseAsync));
                     return;
@@ -316,7 +316,7 @@ namespace EmbedIO.WebSockets.Internal
 
             if (sent)
             {
-                await _stream.WriteAsync(frameAsBytes, 0, frameAsBytes.Length, cancellationToken).ConfigureAwait(false);
+                await _stream.WriteAsync(frameAsBytes!, 0, frameAsBytes.Length, cancellationToken).ConfigureAwait(false);
             }
 
             if (receive && sent)
@@ -340,7 +340,7 @@ namespace EmbedIO.WebSockets.Internal
 
             _inMessage = true;
 
-            if (_messageEventQueue.TryDequeue(out var e))
+            if (_messageEventQueue.TryDequeue(out MessageEventArgs? e))
             {
                 Messages(e);
             }
@@ -371,7 +371,7 @@ namespace EmbedIO.WebSockets.Internal
             _inMessage = true;
             StartReceiving();
 
-            if (!_messageEventQueue.TryDequeue(out var e) || _readyState != WebSocketState.Open)
+            if (!_messageEventQueue.TryDequeue(out MessageEventArgs? e) || _readyState != WebSocketState.Open)
             {
                 _inMessage = false;
                 return;
@@ -386,7 +386,7 @@ namespace EmbedIO.WebSockets.Internal
         {
             if (frame.IsCompressed)
             {
-                using var ms = await frame.PayloadData.ApplicationData.CompressAsync(Compression, false, CancellationToken.None).ConfigureAwait(false);
+                using MemoryStream ms = await frame.PayloadData.ApplicationData.CompressAsync(Compression, false, CancellationToken.None).ConfigureAwait(false);
 
                 _messageEventQueue.Enqueue(new MessageEventArgs(frame.Opcode, ms.ToArray()));
             }
@@ -410,7 +410,7 @@ namespace EmbedIO.WebSockets.Internal
                 InContinuation = true;
             }
 
-            _fragmentsBuffer.AddPayload(frame.PayloadData.ApplicationData);
+            _fragmentsBuffer?.AddPayload(frame.PayloadData.ApplicationData);
 
             if (frame.Fin == Fin.Final)
             {
@@ -498,7 +498,7 @@ namespace EmbedIO.WebSockets.Internal
             _exitReceiving.Dispose();
             _exitReceiving = null;
         }
-        
+
         private Task Send(WebSocketFrame frame)
         {
             lock (_stateSyncRoot)
@@ -532,7 +532,7 @@ namespace EmbedIO.WebSockets.Internal
                 {
                     try
                     {
-                        var frame = await frameStream.ReadFrameAsync(this).ConfigureAwait(false);
+                        WebSocketFrame? frame = await frameStream.ReadFrameAsync(this).ConfigureAwait(false);
 
                         if (frame == null)
                         {

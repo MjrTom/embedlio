@@ -1,6 +1,7 @@
 ﻿using System;
 using EmbedIO.Utilities;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace EmbedIO.Tests.Utilities
 {
@@ -12,7 +13,7 @@ namespace EmbedIO.Tests.Utilities
         [TestCase("/", true)]
         [TestCase("/starts/with/slash", true)]
         public void IsValid_ReturnsCorrectValue(string urlPath, bool expectedResult)
-            => Assert.AreEqual(expectedResult, UrlPath.IsValid(urlPath));
+            => NUnit.Framework.Legacy.ClassicAssert.AreEqual(expectedResult, UrlPath.IsValid(urlPath));
 
         [TestCase(true)]
         [TestCase(false)]
@@ -36,7 +37,7 @@ namespace EmbedIO.Tests.Utilities
         [TestCase("//has/multiple///slashes////", false, "/has/multiple/slashes")]
         [TestCase("//has/multiple//slashes////", true, "/has/multiple/slashes/")]
         public void Normalize_ReturnsCorrectValue(string urlPath, bool isBasePath, string expectedResult)
-            => Assert.AreEqual(expectedResult, UrlPath.Normalize(urlPath, isBasePath));
+            => NUnit.Framework.Legacy.ClassicAssert.AreEqual(expectedResult, UrlPath.Normalize(urlPath, isBasePath));
 
         [TestCase(null, null)]
         [TestCase(null, "/api/")]
@@ -61,7 +62,7 @@ namespace EmbedIO.Tests.Utilities
         [TestCase("/api/v1/endpoint", "/api/v2", false)]
         [TestCase("/api/v1/endpoint", "/api/v2/", false)]
         public void HasPrefix_ReturnsCorrectValue(string urlPath, string baseUrlPath, bool expectedResult)
-            => Assert.AreEqual(expectedResult, UrlPath.HasPrefix(urlPath, baseUrlPath));
+            => NUnit.Framework.Legacy.ClassicAssert.AreEqual(expectedResult, UrlPath.HasPrefix(urlPath, baseUrlPath));
 
         [TestCase(null, null)]
         [TestCase(null, "/api/")]
@@ -88,7 +89,7 @@ namespace EmbedIO.Tests.Utilities
         [TestCase("/api/v1/endpoint", "/api/v2", null)]
         [TestCase("/api/v1/endpoint", "/api/v2/", null)]
         public void StripPrefix_ReturnsCorrectValue(string urlPath, string baseUrlPath, string expectedResult)
-            => Assert.AreEqual(expectedResult, UrlPath.StripPrefix(urlPath, baseUrlPath));
+            => NUnit.Framework.Legacy.ClassicAssert.AreEqual(expectedResult, UrlPath.StripPrefix(urlPath, baseUrlPath));
 
         [Test]
         public void Split_OnNullUrlPath_ThrowsArgumentNullException()

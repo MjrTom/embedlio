@@ -25,9 +25,9 @@ namespace EmbedIO.Tests.Issues
 
             async Task Use(HttpClient client)
             {
-                using var response = await client.GetAsync($"/{tempFolder}").ConfigureAwait(false);
+                using HttpResponseMessage response = await client.GetAsync($"/{tempFolder}").ConfigureAwait(false);
                 var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                Assert.AreEqual(ok, responseString);
+                NUnit.Framework.Legacy.ClassicAssert.AreEqual(ok, responseString);
             }
 
             return TestWebServer.UseAsync(Configure, Use);

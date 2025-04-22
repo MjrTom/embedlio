@@ -13,7 +13,7 @@ namespace EmbedIO.Net
     /// </summary>
     public static class EndPointManager
     {
-        private static readonly ConcurrentDictionary<IPAddress, ConcurrentDictionary<int, EndPointListener>> IPToEndpoints = new ();
+        private static readonly ConcurrentDictionary<IPAddress, ConcurrentDictionary<int, EndPointListener>> IPToEndpoints = new();
 
         /// <summary>
         /// Gets or sets a value indicating whether [use IPv6]. By default, this flag is set.
@@ -50,7 +50,7 @@ namespace EmbedIO.Net
 
         internal static void RemoveEndPoint(EndPointListener epl, IPEndPoint ep)
         {
-            if (IPToEndpoints.TryGetValue(ep.Address, out var p))
+            if (IPToEndpoints.TryGetValue(ep.Address, out ConcurrentDictionary<int, EndPointListener>? p))
             {
                 if (p.TryRemove(ep.Port, out _) && p.Count == 0)
                 {
@@ -79,33 +79,34 @@ namespace EmbedIO.Net
             }
 
             // listens on all the interfaces if host name cannot be parsed by IPAddress.
-            var epl = GetEpListener(lp.Host, lp.Port, listener, lp.Secure);
+            EndPointListener epl = GetEpListener(lp.Host, lp.Port, listener, lp.Secure);
             epl.AddPrefix(lp, listener);
         }
 
         private static EndPointListener GetEpListener(string host, int port, HttpListener listener, bool secure = false)
         {
-            var address = ResolveAddress(host);
+            IPAddress address = ResolveAddress(host);
 
-            var p = IPToEndpoints.GetOrAdd(address, x => new ConcurrentDictionary<int, EndPointListener>());
+            ConcurrentDictionary<int, EndPointListener> p = IPToEndpoints.GetOrAdd(address, x => new ConcurrentDictionary<int, EndPointListener>());
             return p.GetOrAdd(port, x => new EndPointListener(listener, address, x, secure));
         }
 
         private static IPAddress ResolveAddress(string host)
         {
-            if (host == "*" || host == "+" || host == "0.0.0.0")
+            if (host is "*" or "+" or "0.0.0.0")
             {
                 return UseIpv6 ? IPAddress.IPv6Any : IPAddress.Any;
             }
 
-            if (IPAddress.TryParse(host, out var address))
+            if (IPAddress.TryParse(host, out IPAddress? address))
             {
                 return address;
             }
 
             try
             {
-                var hostEntry = new IPHostEntry {
+                var hostEntry = new IPHostEntry
+                {
                     HostName = host,
                     AddressList = Dns.GetHostAddresses(host),
                 };
@@ -129,7 +130,7 @@ namespace EmbedIO.Net
                     return;
                 }
 
-                var epl = GetEpListener(lp.Host, lp.Port, listener, lp.Secure);
+                EndPointListener epl = GetEpListener(lp.Host, lp.Port, listener, lp.Secure);
                 epl.RemovePrefix(lp);
             }
             catch (SocketException)

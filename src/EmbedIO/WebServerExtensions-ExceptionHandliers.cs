@@ -2,7 +2,7 @@
 
 namespace EmbedIO
 {
-    partial class WebServerExtensions
+    static partial class WebServerExtensions
     {
         /// <summary>
         /// Sets the HTTP exception handler on an <see cref="IWebServer" />.

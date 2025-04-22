@@ -17,7 +17,7 @@ namespace EmbedIO.Security
         /// </summary>
         public const int DefaultMaxRequestsPerSecond = 50;
 
-        private static readonly ConcurrentDictionary<IPAddress, ConcurrentBag<long>> Requests = new ConcurrentDictionary<IPAddress, ConcurrentBag<long>>();
+        private static readonly ConcurrentDictionary<IPAddress, ConcurrentBag<long>> Requests = new();
 
         private readonly int _maxRequestsPerSecond;
 
@@ -44,7 +44,7 @@ namespace EmbedIO.Security
             var lastSecond = DateTime.Now.AddSeconds(-1).Ticks;
             var lastMinute = DateTime.Now.AddMinutes(-1).Ticks;
 
-            var shouldBan = Requests.TryGetValue(address, out var attempts) &&
+            var shouldBan = Requests.TryGetValue(address, out ConcurrentBag<long>? attempts) &&
                 (attempts.Count(x => x >= lastSecond) >= _maxRequestsPerSecond ||
                  (attempts.Count(x => x >= lastMinute) / 60) >= _maxRequestsPerSecond);
 
@@ -60,9 +60,10 @@ namespace EmbedIO.Security
         {
             var minTime = DateTime.Now.AddMinutes(-1).Ticks;
 
-            foreach (var k in Requests.Keys)
+            foreach (IPAddress k in Requests.Keys)
             {
-                if (!Requests.TryGetValue(k, out var requests)) continue;
+                if (!Requests.TryGetValue(k, out ConcurrentBag<long>? requests))
+                    continue;
 
                 var recentRequests = new ConcurrentBag<long>(requests.Where(x => x >= minTime));
                 if (!recentRequests.Any())
@@ -81,7 +82,8 @@ namespace EmbedIO.Security
 
         protected virtual void Dispose(bool disposing)
         {
-            if (_disposed) return;
+            if (_disposed)
+                return;
             if (disposing)
             {
                 Requests.Clear();

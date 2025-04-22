@@ -46,7 +46,7 @@
         ///   <paramref name="this" /> with a fail regex criterion configured.
         /// </returns>
         public static TModule WithRegexRules<TModule>(this TModule @this,
-            int maxMatchCount, 
+            int maxMatchCount,
             int secondsMatchingPeriod,
             params string[] value)
             where TModule : IPBanningModule

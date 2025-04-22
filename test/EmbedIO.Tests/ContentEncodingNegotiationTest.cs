@@ -15,10 +15,10 @@ namespace EmbedIO.Tests
             string expectedCompressionMethodName)
         {
             var list = new QValueList(true, requestHeaders);
-            var negotiated = list.TryNegotiateContentEncoding(preferCompression, out var actualCompressionMethod, out var actualCompressionMethodName);
-            Assert.AreEqual(true, negotiated);
-            Assert.AreEqual(expectedCompressionMethod, actualCompressionMethod);
-            Assert.AreEqual(expectedCompressionMethodName, actualCompressionMethodName);
+            var negotiated = list.TryNegotiateContentEncoding(preferCompression, out CompressionMethod actualCompressionMethod, out var actualCompressionMethodName);
+            NUnit.Framework.Legacy.ClassicAssert.AreEqual(true, negotiated);
+            NUnit.Framework.Legacy.ClassicAssert.AreEqual(expectedCompressionMethod, actualCompressionMethod);
+            NUnit.Framework.Legacy.ClassicAssert.AreEqual(expectedCompressionMethodName, actualCompressionMethodName);
         }
 
         [TestCase("*;q=0", true)]
@@ -27,7 +27,7 @@ namespace EmbedIO.Tests
         {
             var list = new QValueList(true, requestHeaders);
             var negotiated = list.TryNegotiateContentEncoding(preferCompression, out _, out _);
-            Assert.AreEqual(false, negotiated);
+            NUnit.Framework.Legacy.ClassicAssert.AreEqual(false, negotiated);
         }
     }
 }

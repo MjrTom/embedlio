@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -36,7 +35,7 @@ namespace EmbedIO.Authentication
         /// <summary>
         /// Gets the authentication realm.
         /// </summary>
-        public string Realm { get; }
+        public string? Realm { get; }
 
         /// <inheritdoc />
         protected sealed override async Task OnRequestAsync(IHttpContext context)
@@ -45,7 +44,7 @@ namespace EmbedIO.Authentication
             {
                 try
                 {
-                    var (userName, password) = GetCredentials(context.Request);
+                    (var userName, var password) = GetCredentials(context.Request);
                     return await VerifyCredentialsAsync(context.RequestedPath, userName, password, context.CancellationToken)
                         .ConfigureAwait(false);
                 }

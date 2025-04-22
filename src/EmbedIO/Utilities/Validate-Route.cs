@@ -2,7 +2,7 @@
 
 namespace EmbedIO.Utilities
 {
-    partial class Validate
+    static partial class Validate
     {
         /// <summary>
         /// Ensures that the value of an argument is a valid route.
@@ -23,7 +23,7 @@ namespace EmbedIO.Utilities
         /// <seealso cref="Routing.Route.IsValid"/>
         public static string Route(string argumentName, string value, bool isBaseRoute)
         {
-            var exception = Routing.Route.ValidateInternal(argumentName, value, isBaseRoute);
+            Exception? exception = Routing.Route.ValidateInternal(argumentName, value, isBaseRoute);
             if (exception != null)
                 throw exception;
 

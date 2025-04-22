@@ -15,7 +15,7 @@ namespace EmbedIO
         /// <exception cref="NullReferenceException"><paramref name="this"/> is <see langword="null"/>.</exception>
         public static void DisableCaching(this IHttpResponse @this)
         {
-            var headers = @this.Headers;
+            System.Net.WebHeaderCollection headers = @this.Headers;
             headers.Set(HttpHeaderNames.Expires, "Sat, 26 Jul 1997 05:00:00 GMT");
             headers.Set(HttpHeaderNames.LastModified, HttpDate.Format(DateTime.UtcNow));
             headers.Set(HttpHeaderNames.CacheControl, "no-store, no-cache, must-revalidate");

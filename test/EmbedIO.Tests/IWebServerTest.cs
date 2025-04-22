@@ -13,7 +13,7 @@ namespace EmbedIO.Tests
         public void SetupInMemoryWebServer_ReturnsValidInstance()
         {
             using var webserver = new TestWebServer();
-            Assert.IsNotNull(webserver);
+            NUnit.Framework.Legacy.ClassicAssert.IsNotNull(webserver);
         }
 
         [Test]
@@ -22,7 +22,7 @@ namespace EmbedIO.Tests
             using var webserver = new TestWebServer();
             webserver.WithCors();
 
-            Assert.AreEqual(1, webserver.Modules.Count);
+            NUnit.Framework.Legacy.ClassicAssert.AreEqual(1, webserver.Modules.Count);
         }
 
         [Test]
@@ -30,7 +30,7 @@ namespace EmbedIO.Tests
         {
             using var webserver = new TestWebServer { SessionManager = new LocalSessionManager() };
 
-            Assert.NotNull(webserver.SessionManager);
+            NUnit.Framework.Legacy.ClassicAssert.NotNull(webserver.SessionManager);
         }
 
         [Test]
@@ -40,7 +40,7 @@ namespace EmbedIO.Tests
             webserver.SessionManager = new LocalSessionManager();
             webserver.SessionManager = null;
 
-            Assert.IsNull(webserver.SessionManager);
+            NUnit.Framework.Legacy.ClassicAssert.IsNull(webserver.SessionManager);
         }
 
         [Test]
@@ -52,12 +52,12 @@ namespace EmbedIO.Tests
                 .Start();
 
             var data = await server.Client.GetStringAsync("/").ConfigureAwait(false);
-            Assert.IsNotNull(data);
+            NUnit.Framework.Legacy.ClassicAssert.IsNotNull(data);
 
-            var person = Json.Deserialize<Person>(data);
-            Assert.IsNotNull(person);
+            Person person = Json.Deserialize<Person>(data);
+            NUnit.Framework.Legacy.ClassicAssert.IsNotNull(person);
 
-            Assert.AreEqual(person.Name, nameof(Person));
+            NUnit.Framework.Legacy.ClassicAssert.AreEqual(person.Name, nameof(Person));
         }
     }
 }

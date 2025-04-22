@@ -1,29 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Threading;
+
 using Swan;
 
 namespace EmbedIO.WebSockets.Internal
 {
-    internal class WebSocketStream : MemoryStream
+    internal class WebSocketStream(byte[] data, Opcode opcode, CompressionMethod compression) : MemoryStream(data)
     {
         internal const int FragmentLength = 1016;
 
-        private readonly CompressionMethod _compression;
-        private readonly Opcode _opcode;
-
-        public WebSocketStream(byte[] data, Opcode opcode, CompressionMethod compression)
-            : base(data)
-        {
-            _compression = compression;
-            _opcode = opcode;
-        }
+        private readonly CompressionMethod _compression = compression;
+        private readonly Opcode _opcode = opcode;
 
         public IEnumerable<WebSocketFrame> GetFrames()
         {
             var compressed = _compression != CompressionMethod.None;
-            var stream = compressed
+            MemoryStream stream = compressed
                 ? this.CompressAsync(_compression, true, CancellationToken.None).Await()
                 : this;
 
@@ -33,7 +26,7 @@ namespace EmbedIO.WebSockets.Internal
 
             if (len == 0)
             {
-                yield return new WebSocketFrame(Fin.Final, _opcode, Array.Empty<byte>(), compressed);
+                yield return new WebSocketFrame(Fin.Final, _opcode,[], compressed);
                 yield break;
             }
 

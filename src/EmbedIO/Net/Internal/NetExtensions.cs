@@ -30,9 +30,9 @@ namespace EmbedIO.Net.Internal
 
             return bytes;
         }
-        
+
         internal static byte[] ToHostOrder(this byte[] source, Endianness sourceOrder)
-            => source.Length < 1 ? source 
+            => source.Length < 1 ? source
             : sourceOrder.IsHostOrder() ? source
             : source.Reverse().ToArray();
 

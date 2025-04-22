@@ -22,7 +22,7 @@ namespace EmbedIO.Files
         public const string DefaultDocumentName = "index.html";
 
         private readonly string _cacheSectionName = UniqueIdGenerator.GetNext();
-        private readonly MimeTypeCustomizer _mimeTypeCustomizer = new MimeTypeCustomizer();
+        private readonly MimeTypeCustomizer _mimeTypeCustomizer = new();
         private readonly ConcurrentDictionary<string, MappedResourceInfo>? _mappingCache;
 
         private FileCache _cache = FileCache.Default;
@@ -373,7 +373,7 @@ namespace EmbedIO.Files
         // Directories mus be returned regardless of directory listing being enabled.
         private MappedResourceInfo? MapUrlPath(string urlPath, IMimeTypeProvider mimeTypeProvider)
         {
-            var result = Provider.MapUrlPath(urlPath, mimeTypeProvider);
+            MappedResourceInfo? result = Provider.MapUrlPath(urlPath, mimeTypeProvider);
 
             // If urlPath maps to a file, no further searching is needed.
             if (result?.IsFile ?? false)
@@ -385,7 +385,7 @@ namespace EmbedIO.Files
             if (DefaultDocument != null)
             {
                 var defaultDocumentPath = urlPath + (urlPath.Length > 1 ? "/" : string.Empty) + DefaultDocument;
-                var defaultDocumentResult = Provider.MapUrlPath(defaultDocumentPath, mimeTypeProvider);
+                MappedResourceInfo? defaultDocumentResult = Provider.MapUrlPath(defaultDocumentPath, mimeTypeProvider);
                 if (defaultDocumentResult?.IsFile ?? false)
                     return defaultDocumentResult;
             }
@@ -395,7 +395,7 @@ namespace EmbedIO.Files
             // When the default extension is applied, the result must be a file.
             if (DefaultExtension != null && urlPath.Length > 1)
             {
-                var defaultExtensionResult = Provider.MapUrlPath(urlPath + DefaultExtension, mimeTypeProvider);
+                MappedResourceInfo? defaultExtensionResult = Provider.MapUrlPath(urlPath + DefaultExtension, mimeTypeProvider);
                 if (defaultExtensionResult?.IsFile ?? false)
                     return defaultExtensionResult;
             }
@@ -407,7 +407,7 @@ namespace EmbedIO.Files
         {
             // Try to extract resource information from cache.
             var cachingThreshold = 1024L * Cache.MaxFileSizeKb;
-            if (!_cacheSection!.TryGet(info.Path, out var cacheItem))
+            if (!_cacheSection!.TryGet(info.Path, out FileCacheItem? cacheItem))
             {
                 // Resource information not yet cached
                 cacheItem = new FileCacheItem(_cacheSection, info.LastModifiedUtc, info.Length);
@@ -450,7 +450,7 @@ namespace EmbedIO.Files
             if (!context.TryDetermineCompression(mimeType, out var preferCompression))
                 preferCompression = true;
             preferCompression &= context.Request.Headers.Get(HttpHeaderNames.Range) == null;
-            if (!context.Request.TryNegotiateContentEncoding(preferCompression, out var compressionMethod, out var setCompressionInResponse))
+            if (!context.Request.TryNegotiateContentEncoding(preferCompression, out CompressionMethod compressionMethod, out Action<IHttpResponse>? setCompressionInResponse))
             {
                 // If negotiation failed, the returned callback will do the right thing.
                 setCompressionInResponse(context.Response);
@@ -534,7 +534,7 @@ namespace EmbedIO.Files
                 {
                     using (var compressor = new CompressionStream(memoryStream, compressionMethod))
                     {
-                        using var source = Provider.OpenFile(info.Path);
+                        using Stream source = Provider.OpenFile(info.Path);
                         await source.CopyToAsync(compressor, WebServer.StreamCopyBufferSize, context.CancellationToken)
                             .ConfigureAwait(false);
                     }
@@ -558,7 +558,7 @@ namespace EmbedIO.Files
             }
 
             // Read and transfer content without caching.
-            using (var source = Provider.OpenFile(info.Path))
+            using (Stream source = Provider.OpenFile(info.Path))
             {
                 context.Response.SendChunked = true;
 

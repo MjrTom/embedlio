@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Text;
+
 using EmbedIO.Internal;
 using EmbedIO.Net.Internal;
 using EmbedIO.Utilities;
@@ -70,7 +70,7 @@ namespace EmbedIO.Net
                     if (i < pairs.Length - 1)
                         buff.AppendFormat(CultureInfo.InvariantCulture, ", {0}", pairs[++i].Trim());
 
-                    if (!HttpDate.TryParse(buff.ToString(), out var expires))
+                    if (!HttpDate.TryParse(buff.ToString(), out DateTimeOffset expires))
                         expires = DateTimeOffset.Now;
 
                     if (cookie.Expires == DateTime.MinValue)
@@ -171,7 +171,7 @@ namespace EmbedIO.Net
                     "The elements in this collection cannot be cast automatically to the type of the destination array.");
             }
 
-            ((IList) this).CopyTo(array, index);
+            this.CopyTo(array, index);
         }
 
         private static string? GetValue(string nameAndValue, bool unquote = false)
@@ -229,12 +229,14 @@ namespace EmbedIO.Net
 
             for (var i = Count - 1; i >= 0; i--)
             {
-                var c = this[i];
+                Cookie c = this[i];
                 if (c.Name.Equals(name, StringComparison.OrdinalIgnoreCase) &&
                     c.Path.Equals(path, StringComparison.OrdinalIgnoreCase) &&
                     c.Domain.Equals(domain, StringComparison.OrdinalIgnoreCase) &&
                     c.Version == ver)
+                {
                     return i;
+                }
             }
 
             return -1;

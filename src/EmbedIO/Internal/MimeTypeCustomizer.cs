@@ -6,8 +6,8 @@ namespace EmbedIO.Internal
 {
     internal sealed class MimeTypeCustomizer : ConfiguredObject, IMimeTypeCustomizer
     {
-        private readonly Dictionary<string, string> _customMimeTypes = new Dictionary<string, string>();
-        private readonly Dictionary<(string, string), bool> _data = new Dictionary<(string, string), bool>();
+        private readonly Dictionary<string, string> _customMimeTypes = new();
+        private readonly Dictionary<(string, string), bool> _data = new();
 
         private bool? _defaultPreferCompression;
 
@@ -19,7 +19,7 @@ namespace EmbedIO.Internal
 
         public bool TryDetermineCompression(string mimeType, out bool preferCompression)
         {
-            var (type, subtype) = MimeType.UnsafeSplit(
+            (var type, var subtype) = MimeType.UnsafeSplit(
                 Validate.MimeType(nameof(mimeType), mimeType, false));
 
             if (_data.TryGetValue((type, subtype), out preferCompression))
@@ -45,7 +45,7 @@ namespace EmbedIO.Internal
         public void PreferCompression(string mimeType, bool preferCompression)
         {
             EnsureConfigurationNotLocked();
-            var (type, subtype) = MimeType.UnsafeSplit(
+            (var type, var subtype) = MimeType.UnsafeSplit(
                 Validate.MimeType(nameof(mimeType), mimeType, true));
 
             if (type == "*")

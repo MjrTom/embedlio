@@ -14,13 +14,13 @@ namespace EmbedIO.Sessions.Internal
         public bool Exists => false;
 
         /// <inheritdoc/>
-        public string Id => throw NoSessionManager();
+        public string Id => throw DummySessionProxy.NoSessionManager();
 
         /// <inheritdoc/>
-        public TimeSpan Duration => throw NoSessionManager();
+        public TimeSpan Duration => throw DummySessionProxy.NoSessionManager();
 
         /// <inheritdoc/>
-        public DateTime LastActivity => throw NoSessionManager();
+        public DateTime LastActivity => throw DummySessionProxy.NoSessionManager();
 
         /// <inheritdoc/>
         public int Count => 0;
@@ -31,8 +31,8 @@ namespace EmbedIO.Sessions.Internal
         /// <inheritdoc/>
         public object this[string key]
         {
-            get => throw NoSessionManager();
-            set => throw NoSessionManager();
+            get => throw DummySessionProxy.NoSessionManager();
+            set => throw DummySessionProxy.NoSessionManager();
         }
 
         /// <inheritdoc/>
@@ -41,7 +41,7 @@ namespace EmbedIO.Sessions.Internal
         }
 
         /// <inheritdoc/>
-        public void Regenerate() => throw NoSessionManager();
+        public void Regenerate() => throw DummySessionProxy.NoSessionManager();
 
         /// <inheritdoc/>
         public void Clear()
@@ -49,17 +49,17 @@ namespace EmbedIO.Sessions.Internal
         }
 
         /// <inheritdoc/>
-        public bool ContainsKey(string key) => throw NoSessionManager();
+        public bool ContainsKey(string key) => throw DummySessionProxy.NoSessionManager();
 
         /// <inheritdoc/>
-        public bool TryGetValue(string key, out object value) => throw NoSessionManager();
+        public bool TryGetValue(string key, out object value) => throw DummySessionProxy.NoSessionManager();
 
         /// <inheritdoc/>
-        public bool TryRemove(string key, out object value) => throw NoSessionManager();
+        public bool TryRemove(string key, out object value) => throw DummySessionProxy.NoSessionManager();
 
         /// <inheritdoc/>
-        public IReadOnlyList<KeyValuePair<string, object>> TakeSnapshot() => throw NoSessionManager();
+        public IReadOnlyList<KeyValuePair<string, object>> TakeSnapshot() => throw DummySessionProxy.NoSessionManager();
 
-        private InvalidOperationException NoSessionManager() => new InvalidOperationException("No session manager registered in the web server.");
+        private static InvalidOperationException NoSessionManager() => new("No session manager registered in the web server.");
     }
 }

@@ -4,17 +4,18 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+
 using EmbedIO.Utilities;
+
 using Swan;
 
 namespace EmbedIO.Files.Internal
 {
     internal class HtmlDirectoryLister : IDirectoryLister
     {
-        private static readonly Lazy<IDirectoryLister> LazyInstance = new Lazy<IDirectoryLister>(() => new HtmlDirectoryLister());
+        private static readonly Lazy<IDirectoryLister> LazyInstance = new(() => new HtmlDirectoryLister());
 
         private HtmlDirectoryLister()
         {
@@ -50,7 +51,7 @@ namespace EmbedIO.Files.Internal
 
             entries = entries.ToArray();
 
-            foreach (var directory in entries.Where(m => m.IsDirectory).OrderBy(e => e.Name))
+            foreach (MappedResourceInfo? directory in entries.Where(m => m.IsDirectory).OrderBy(e => e.Name))
             {
                 text.Write($"<a href=\"{Uri.EscapeDataString(directory.Name)}{Path.DirectorySeparatorChar}\">{WebUtility.HtmlEncode(directory.Name)}</a>");
                 text.Write(new string(' ', Math.Max(1, MaxEntryLength - directory.Name.Length + 1)));
@@ -59,7 +60,7 @@ namespace EmbedIO.Files.Internal
                 await Task.Yield();
             }
 
-            foreach (var file in entries.Where(m => m.IsFile).OrderBy(e => e.Name))
+            foreach (MappedResourceInfo? file in entries.Where(m => m.IsFile).OrderBy(e => e.Name))
             {
                 text.Write($"<a href=\"{Uri.EscapeDataString(file.Name)}\">{WebUtility.HtmlEncode(file.Name)}</a>");
                 text.Write(new string(' ', Math.Max(1, MaxEntryLength - file.Name.Length + 1)));

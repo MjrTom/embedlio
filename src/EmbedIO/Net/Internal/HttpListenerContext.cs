@@ -18,11 +18,11 @@ namespace EmbedIO.Net.Internal
     // Provides access to the request and response objects used by the HttpListener class.
     internal sealed class HttpListenerContext : IHttpContextImpl
     {
-        private readonly Lazy<IDictionary<object, object>> _items = new (() => new Dictionary<object, object>(), true);
+        private readonly Lazy<IDictionary<object, object>> _items = new(() => new Dictionary<object, object>(), true);
 
-        private readonly TimeKeeper _ageKeeper = new ();
+        private readonly TimeKeeper _ageKeeper = new();
 
-        private readonly Stack<Action<IHttpContext>> _closeCallbacks = new ();
+        private readonly Stack<Action<IHttpContext>> _closeCallbacks = new();
 
         private bool _closed;
 
@@ -57,7 +57,7 @@ namespace EmbedIO.Net.Internal
 
         public IHttpResponse Response => HttpListenerResponse;
 
-        public IPrincipal User { get; set;  }
+        public IPrincipal User { get; set; }
 
         public ISessionProxy Session { get; set; }
 
@@ -96,7 +96,7 @@ namespace EmbedIO.Net.Internal
             // Always close the response stream no matter what.
             Response.Close();
 
-            foreach (var callback in _closeCallbacks)
+            foreach (Action<IHttpContext> callback in _closeCallbacks)
             {
                 try
                 {
@@ -116,7 +116,7 @@ namespace EmbedIO.Net.Internal
             TimeSpan keepAliveInterval,
             CancellationToken cancellationToken)
         {
-            var webSocket = await WebSocket.AcceptAsync(this, acceptedProtocol).ConfigureAwait(false);
+            WebSocket webSocket = await WebSocket.AcceptAsync(this, acceptedProtocol).ConfigureAwait(false);
             return new WebSocketContext(this, WebSocket.SupportedVersion, requestedProtocols, acceptedProtocol, webSocket, cancellationToken);
         }
 

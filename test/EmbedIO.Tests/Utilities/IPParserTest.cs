@@ -1,5 +1,6 @@
 ﻿using EmbedIO.Utilities;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -18,7 +19,7 @@ namespace EmbedIO.Tests.Utilities
         [TestCase("192.168.1.52/24.1", false)]
         [TestCase("192.168.1.52/24", true)]
         public void IsCIDRNotation_ReturnsCorrectValue(string address, bool expectedResult)
-            => Assert.AreEqual(expectedResult, IPParser.IsCidrNotation(address));
+            => NUnit.Framework.Legacy.ClassicAssert.AreEqual(expectedResult, IPParser.IsCidrNotation(address));
 
         [TestCase(null, false)]
         [TestCase("", false)]
@@ -31,7 +32,7 @@ namespace EmbedIO.Tests.Utilities
         [TestCase("192.168-169.1-2.52-53", true)]
         [TestCase("192-193.168-169.1-2.52-53", true)]
         public void IsSimpleIPRange_ReturnsCorrectValue(string address, bool expectedResult)
-            => Assert.AreEqual(expectedResult, IPParser.IsSimpleIPRange(address));
+            => NUnit.Framework.Legacy.ClassicAssert.AreEqual(expectedResult, IPParser.IsSimpleIPRange(address));
 
         [TestCase(null)]
         [TestCase("192.168.1.52/")]
@@ -70,6 +71,6 @@ namespace EmbedIO.Tests.Utilities
         [TestCase("192.168-169.1-2.50-53", 16)]
         [TestCase("192-193.168-169.1-2.50-53", 32)]
         public async Task IpParseCount_ReturnsCorrectValue(string address, int count)
-            => Assert.AreEqual(count, (await IPParser.ParseAsync(address)).Count());
+            => NUnit.Framework.Legacy.ClassicAssert.AreEqual(count, (await IPParser.ParseAsync(address)).Count());
     }
 }

@@ -8,14 +8,9 @@ using Swan.Logging;
 
 namespace EmbedIO.Tests
 {
-    public abstract class EndToEndFixtureBase : IDisposable
+    public abstract class EndToEndFixtureBase(bool useTestWebServer = true) : IDisposable
     {
-        private readonly bool _useTestWebServer;
-
-        protected EndToEndFixtureBase(bool useTestWebServer = true)
-        {
-            _useTestWebServer = useTestWebServer;
-        }
+        private readonly bool _useTestWebServer = useTestWebServer;
 
         ~EndToEndFixtureBase()
         {
@@ -65,7 +60,8 @@ namespace EmbedIO.Tests
 
         protected virtual void Dispose(bool disposing)
         {
-            if (!disposing) return;
+            if (!disposing)
+                return;
 
             Client?.Dispose();
             Server?.Dispose();

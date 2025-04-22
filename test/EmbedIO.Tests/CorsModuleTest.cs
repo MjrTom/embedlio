@@ -28,8 +28,8 @@ namespace EmbedIO.Tests
             request.Headers.Add(HttpHeaderNames.AccessControlRequestMethod, "post");
             request.Headers.Add(HttpHeaderNames.AccessControlRequestHeaders, "content-type");
 
-            var response = await Client.SendAsync(request);
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "Status Code OK");
+            HttpResponseMessage response = await Client.SendAsync(request);
+            NUnit.Framework.Legacy.ClassicAssert.AreEqual(HttpStatusCode.OK, response.StatusCode, "Status Code OK");
         }
     }
 }

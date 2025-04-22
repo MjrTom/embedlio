@@ -20,7 +20,7 @@ namespace EmbedIO.Samples
         private static void Main(string[] args)
         {
             var url = args.Length > 0 ? args[0] : "http://*:8877";
-            if (!Uri.TryCreate(url, UriKind.Absolute, out var validatedUrl) || (validatedUrl.Scheme != Uri.UriSchemeHttp && validatedUrl.Scheme != Uri.UriSchemeHttps))
+            if (!Uri.TryCreate(url, UriKind.Absolute, out Uri? validatedUrl) || (validatedUrl.Scheme != Uri.UriSchemeHttp && validatedUrl.Scheme != Uri.UriSchemeHttps))
             {
                 Console.WriteLine("Invalid URL provided. Using default URL: http://localhost:8877");
                 url = "http://localhost:8877";
@@ -52,7 +52,7 @@ namespace EmbedIO.Samples
                 var assemblyPath = Path.GetDirectoryName(typeof(Program).Assembly.Location);
 
 #if DEBUG
-                return Path.Combine(Directory.GetParent(assemblyPath).Parent.Parent.FullName, "html");
+                return Path.Combine(Directory.GetParent(assemblyPath!).Parent.Parent.FullName, "html");
 #else
                 return Path.Combine(assemblyPath, "html");
 #endif
@@ -63,7 +63,7 @@ namespace EmbedIO.Samples
         private static WebServer CreateWebServer(string url)
         {
 #pragma warning disable CA2000 // Call Dispose on object - this is a factory method.
-            var server = new WebServer(o => o
+            WebServer server = new WebServer(o => o
                     .WithUrlPrefix(url)
                     .WithMode(HttpListenerMode.EmbedIO))
                 .WithIPBanning(o => o
@@ -95,7 +95,7 @@ namespace EmbedIO.Samples
         // Create and run a web server.
         private static async Task RunWebServerAsync(string url, CancellationToken cancellationToken)
         {
-            using var server = CreateWebServer(url);
+            using WebServer server = CreateWebServer(url);
             await server.RunAsync(cancellationToken).ConfigureAwait(false);
         }
 
@@ -113,8 +113,9 @@ namespace EmbedIO.Samples
 
             // Fire up the browser to show the content!
             using var browser = new Process();
-            browser.StartInfo = new ProcessStartInfo(allowedUrl) {
-                UseShellExecute = true
+            browser.StartInfo = new ProcessStartInfo(allowedUrl)
+            {
+                UseShellExecute = true,
             };
             browser.Start();
         }

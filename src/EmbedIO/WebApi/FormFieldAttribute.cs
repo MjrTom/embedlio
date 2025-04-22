@@ -28,7 +28,7 @@ namespace EmbedIO.WebApi
     /// <seealso cref="IRequestDataAttribute{TController,TData}" />
     /// <seealso cref="IRequestDataAttribute{TController}" />
     [AttributeUsage(AttributeTargets.Parameter)]
-    public sealed class FormFieldAttribute : 
+    public sealed class FormFieldAttribute :
         Attribute,
         IRequestDataAttribute<WebApiController, string>,
         IRequestDataAttribute<WebApiController, string[]>,
@@ -112,7 +112,7 @@ namespace EmbedIO.WebApi
             WebApiController controller,
             string parameterName)
         {
-            var data = await controller.HttpContext.GetRequestFormDataAsync()
+            System.Collections.Specialized.NameValueCollection data = await controller.HttpContext.GetRequestFormDataAsync()
                 .ConfigureAwait(false);
 
             var fieldName = FieldName ?? parameterName;
@@ -126,14 +126,14 @@ namespace EmbedIO.WebApi
             WebApiController controller,
             string parameterName)
         {
-            var data = await controller.HttpContext.GetRequestFormDataAsync()
+            System.Collections.Specialized.NameValueCollection data = await controller.HttpContext.GetRequestFormDataAsync()
                 .ConfigureAwait(false);
 
             var fieldName = FieldName ?? parameterName;
             if (!data.ContainsKey(fieldName) && BadRequestIfMissing)
                 throw HttpException.BadRequest($"Missing form field {fieldName}.");
 
-            return data.GetValues(fieldName) ?? Array.Empty<string>();
+            return data.GetValues(fieldName) ??[];
         }
 
         async Task<object?> IRequestDataAttribute<WebApiController>.GetRequestDataAsync(
@@ -141,7 +141,7 @@ namespace EmbedIO.WebApi
             Type type,
             string parameterName)
         {
-            var data = await controller.HttpContext.GetRequestFormDataAsync()
+            System.Collections.Specialized.NameValueCollection data = await controller.HttpContext.GetRequestFormDataAsync()
                 .ConfigureAwait(false);
 
             var fieldName = FieldName ?? parameterName;
@@ -150,7 +150,7 @@ namespace EmbedIO.WebApi
 
             if (type.IsArray)
             {
-                var fieldValues = data.GetValues(fieldName) ?? Array.Empty<string>();
+                var fieldValues = data.GetValues(fieldName) ??[];
                 if (!FromString.TryConvertTo(type, fieldValues, out var result))
                     throw HttpException.BadRequest($"Cannot convert field {fieldName} to an array of {type.GetElementType().Name}.");
 

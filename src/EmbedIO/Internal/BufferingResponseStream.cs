@@ -9,16 +9,10 @@ namespace EmbedIO.Internal
     // in a MemoryStream.
     // When disposed, sets the response's ContentLength and copies all data
     // to the output stream.
-    internal class BufferingResponseStream : Stream
+    internal class BufferingResponseStream(IHttpResponse response) : Stream
     {
-        private readonly IHttpResponse _response;
-        private readonly MemoryStream _buffer;
-
-        public BufferingResponseStream(IHttpResponse response)
-        {
-            _response = response;
-            _buffer = new MemoryStream();
-        }
+        private readonly IHttpResponse _response = response;
+        private readonly MemoryStream _buffer = new();
 
         public override bool CanRead => false;
 
@@ -33,7 +27,7 @@ namespace EmbedIO.Internal
             get => _buffer.Position;
             set => throw SeekingNotSupported();
         }
-        
+
         public override void Flush() => _buffer.Flush();
 
         public override Task FlushAsync(CancellationToken cancellationToken) => _buffer.FlushAsync(cancellationToken);
@@ -42,7 +36,7 @@ namespace EmbedIO.Internal
 
         public override int ReadByte() => throw ReadingNotSupported();
 
-        public override IAsyncResult BeginRead(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
+        public override IAsyncResult BeginRead(byte[] buffer, int offset, int count, AsyncCallback? callback, object? state)
             => throw ReadingNotSupported();
 
         public override int EndRead(IAsyncResult asyncResult) => throw ReadingNotSupported();
@@ -60,14 +54,14 @@ namespace EmbedIO.Internal
 
         public override void WriteByte(byte value) => _buffer.WriteByte(value);
 
-        public override IAsyncResult BeginWrite(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
+        public override IAsyncResult BeginWrite(byte[] buffer, int offset, int count, AsyncCallback? callback, object? state)
             => _buffer.BeginWrite(buffer, offset, count, callback, state);
 
         public override void EndWrite(IAsyncResult asyncResult) => _buffer.EndWrite(asyncResult);
 
         public override Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
             => _buffer.WriteAsync(buffer, offset, count, cancellationToken);
-        
+
         protected override void Dispose(bool disposing)
         {
             _response.ContentLength64 = _buffer.Length;

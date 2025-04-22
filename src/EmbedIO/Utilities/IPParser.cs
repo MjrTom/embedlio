@@ -21,9 +21,9 @@ namespace EmbedIO.Utilities
         public static async Task<IEnumerable<IPAddress>> ParseAsync(string address)
         {
             if (address == null)
-                return Enumerable.Empty<IPAddress>();
+                return [];
 
-            if (IPAddress.TryParse(address, out var ip))
+            if (IPAddress.TryParse(address, out IPAddress? ip))
                 return new List<IPAddress> { ip };
 
             try
@@ -42,7 +42,7 @@ namespace EmbedIO.Utilities
             if (IsCidrNotation(address))
                 return ParseCidrNotation(address);
 
-            return IsSimpleIPRange(address) ? TryParseSimpleIPRange(address) : Enumerable.Empty<IPAddress>();
+            return IsSimpleIPRange(address) ? TryParseSimpleIPRange(address) :[];
         }
 
         /// <summary>
@@ -79,17 +79,17 @@ namespace EmbedIO.Utilities
         public static IEnumerable<IPAddress> ParseCidrNotation(string range)
         {
             if (!IsCidrNotation(range))
-                return Enumerable.Empty<IPAddress>();
+                return [];
 
             var parts = range.Split('/');
             var prefix = parts[0];
-            
+
             if (!byte.TryParse(parts[1], out var prefixLen))
-                return Enumerable.Empty<IPAddress>();
+                return [];
 
             var prefixParts = prefix.Split('.');
             if (prefixParts.Select(x => byte.TryParse(x, out _)).Any(x => !x))
-                return Enumerable.Empty<IPAddress>();
+                return [];
 
             uint ip = 0;
             for (var i = 0; i < 4; i++)
@@ -102,7 +102,7 @@ namespace EmbedIO.Utilities
             var ip1 = (ip >> shiftBits) << shiftBits;
 
             if ((ip1 & ip) != ip1) // Check correct subnet address
-                return Enumerable.Empty<IPAddress>();
+                return [];
 
             var ip2 = ip1 >> shiftBits;
             for (var k = 0; k < shiftBits; k++)
@@ -141,12 +141,14 @@ namespace EmbedIO.Utilities
             foreach (var part in parts)
             {
                 var rangeParts = part.Split('-');
-                if (rangeParts.Length < 1 || rangeParts.Length > 2)
+                if (rangeParts.Length is < 1 or > 2)
                     return false;
 
                 if (!byte.TryParse(rangeParts[0], out _) ||
                     (rangeParts.Length > 1 && !byte.TryParse(rangeParts[1], out _)))
+                {
                     return false;
+                }
             }
 
             return true;
@@ -160,7 +162,7 @@ namespace EmbedIO.Utilities
         public static IEnumerable<IPAddress> TryParseSimpleIPRange(string range)
         {
             if (!IsSimpleIPRange(range))
-                return Enumerable.Empty<IPAddress>();
+                return [];
 
             var beginIP = new byte[4];
             var endIP = new byte[4];
@@ -181,9 +183,9 @@ namespace EmbedIO.Utilities
             for (var i = 0; i < 4; i++)
             {
                 if (endIP[i] < beginIP[i])
-                    return Enumerable.Empty<IPAddress>();
+                    return [];
             }
-            
+
             var capacity = 1;
             for (var i = 0; i < 4; i++)
                 capacity *= endIP[i] - beginIP[i] + 1;
@@ -197,7 +199,7 @@ namespace EmbedIO.Utilities
                     {
                         for (int i3 = beginIP[3]; i3 <= endIP[3]; i3++)
                         {
-                            ips.Add(new IPAddress(new[] { (byte)i0, (byte)i1, (byte)i2, (byte)i3 }));
+                            ips.Add(new IPAddress([(byte)i0, (byte)i1, (byte)i2, (byte)i3]));
                         }
                     }
                 }

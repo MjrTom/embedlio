@@ -71,7 +71,8 @@ namespace EmbedIO.Routing
 
         // Check the validity of a route by parsing it without storing the results.
         // Returns: ArgumentNullException, ArgumentException, null if OK
-        internal static Exception? ValidateInternal(string argumentName, string value, bool isBaseRoute) => ParseInternal(value, isBaseRoute, null) switch {
+        internal static Exception? ValidateInternal(string argumentName, string value, bool isBaseRoute) => ParseInternal(value, isBaseRoute, null) switch
+        {
             ArgumentNullException _ => new ArgumentNullException(argumentName),
             FormatException formatException => new ArgumentException(formatException.Message, argumentName),
             Exception exception => exception,
@@ -105,7 +106,7 @@ namespace EmbedIO.Routing
             const string InitialRegexOptions = "(?sn-imx)";
 
             // If setResult is null we don't need the StringBuilder.
-            var sb = setResult == null ? null : new StringBuilder("^");
+            StringBuilder? sb = setResult == null ? null : new StringBuilder("^");
 
             var parameterNames = new List<string>();
             if (route.Length == 1)

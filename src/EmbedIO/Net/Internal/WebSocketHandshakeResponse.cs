@@ -21,7 +21,7 @@ namespace EmbedIO.Net.Internal
             Headers[HttpHeaderNames.Upgrade] = "websocket";
             Headers[HttpHeaderNames.Connection] = "Upgrade";
 
-            foreach (var cookie in context.Request.Cookies)
+            foreach (Cookie cookie in context.Request.Cookies)
             {
                 Headers.Add("Set-Cookie", cookie.ToString());
             }
@@ -30,14 +30,14 @@ namespace EmbedIO.Net.Internal
         public string Reason { get; }
 
         public int StatusCode { get; }
-        
+
         public NameValueCollection Headers { get; }
 
         public Version ProtocolVersion { get; }
 
         public override string ToString()
         {
-            var output = new StringBuilder(64)
+            StringBuilder output = new StringBuilder(64)
                 .AppendFormat(CultureInfo.InvariantCulture, "HTTP/{0} {1} {2}\r\n", ProtocolVersion, StatusCode, Reason);
 
             foreach (var key in Headers.AllKeys)
@@ -46,7 +46,7 @@ namespace EmbedIO.Net.Internal
             }
 
             _ = output.Append("\r\n");
-            
+
             return output.ToString();
         }
     }

@@ -42,7 +42,7 @@ namespace EmbedIO
         /// <para>Gets or sets the user.</para>
         /// <para>This API supports the EmbedIO infrastructure and is not intended to be used directly from your code.</para>
         /// </summary>
-        new IPrincipal User { get; set; }
+        new IPrincipal? User { get; set; }
 
         /// <summary>
         /// <para>Gets or sets a value indicating whether compressed request bodies are supported.</para>
@@ -79,9 +79,9 @@ namespace EmbedIO
         /// An <see cref="IWebSocketContext"/> interface.
         /// </returns>
         Task<IWebSocketContext> AcceptWebSocketAsync(
-            IEnumerable<string> requestedProtocols, 
-            string acceptedProtocol, 
-            int receiveBufferSize, 
+            IEnumerable<string> requestedProtocols,
+            string acceptedProtocol,
+            int receiveBufferSize,
             TimeSpan keepAliveInterval,
             CancellationToken cancellationToken);
     }

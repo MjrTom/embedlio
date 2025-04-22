@@ -26,15 +26,15 @@ namespace EmbedIO.Tests
             [Test]
             public async Task UnhandledException_ResponseIsAsExpected()
             {
-                var response = await Client.GetAsync(UrlPath.Root);
+                System.Net.Http.HttpResponseMessage response = await Client.GetAsync(UrlPath.Root);
 
-                Assert.IsNotNull(response);
-                Assert.AreEqual(HttpStatusCode.InternalServerError, response.StatusCode);
-                CollectionAssert.AreEqual(
+                NUnit.Framework.Legacy.ClassicAssert.IsNotNull(response);
+                NUnit.Framework.Legacy.ClassicAssert.AreEqual(HttpStatusCode.InternalServerError, response.StatusCode);
+                NUnit.Framework.Legacy.CollectionAssert.AreEqual(
                     new[] { nameof(Exception) },
                     response.Headers.GetValues(ExceptionHandler.ExceptionTypeHeaderName));
 
-                CollectionAssert.AreEqual(
+                NUnit.Framework.Legacy.CollectionAssert.AreEqual(
                     new[] { _exceptionMessage },
                     response.Headers.GetValues(ExceptionHandler.ExceptionMessageHeaderName));
             }
@@ -70,11 +70,11 @@ namespace EmbedIO.Tests
             [Test]
             public async Task HttpException_ResponseIsAsExpected()
             {
-                var response = await Client.GetAsync(UrlPath.Root);
+                System.Net.Http.HttpResponseMessage response = await Client.GetAsync(UrlPath.Root);
 
-                Assert.IsNotNull(response);
-                Assert.AreEqual(HttpExceptionStatusCode, response.StatusCode);
-                Assert.AreEqual(
+                NUnit.Framework.Legacy.ClassicAssert.IsNotNull(response);
+                NUnit.Framework.Legacy.ClassicAssert.AreEqual(HttpExceptionStatusCode, response.StatusCode);
+                NUnit.Framework.Legacy.ClassicAssert.AreEqual(
                     _exceptionMessage,
                     await response.Content.ReadAsStringAsync());
             }

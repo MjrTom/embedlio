@@ -28,7 +28,7 @@ namespace EmbedIO.WebApi
     /// <seealso cref="IRequestDataAttribute{TController,TData}" />
     /// <seealso cref="IRequestDataAttribute{TController}" />
     [AttributeUsage(AttributeTargets.Parameter)]
-    public sealed class QueryFieldAttribute : 
+    public sealed class QueryFieldAttribute :
         Attribute,
         IRequestDataAttribute<WebApiController, string>,
         IRequestDataAttribute<WebApiController, string[]>,
@@ -112,7 +112,7 @@ namespace EmbedIO.WebApi
             WebApiController controller,
             string parameterName)
         {
-            var data = controller.HttpContext.GetRequestQueryData();
+            System.Collections.Specialized.NameValueCollection data = controller.HttpContext.GetRequestQueryData();
 
             var fieldName = FieldName ?? parameterName;
             if (!data.ContainsKey(fieldName) && BadRequestIfMissing)
@@ -125,13 +125,13 @@ namespace EmbedIO.WebApi
             WebApiController controller,
             string parameterName)
         {
-            var data = controller.HttpContext.GetRequestQueryData();
+            System.Collections.Specialized.NameValueCollection data = controller.HttpContext.GetRequestQueryData();
 
             var fieldName = FieldName ?? parameterName;
             if (!data.ContainsKey(fieldName) && BadRequestIfMissing)
                 throw HttpException.BadRequest($"Missing query field {fieldName}.");
 
-            return Task.FromResult(data.GetValues(fieldName) ?? Array.Empty<string>());
+            return Task.FromResult(data.GetValues(fieldName) ??[]);
         }
 
         Task<object?> IRequestDataAttribute<WebApiController>.GetRequestDataAsync(
@@ -139,7 +139,7 @@ namespace EmbedIO.WebApi
             Type type,
             string parameterName)
         {
-            var data = controller.HttpContext.GetRequestQueryData();
+            System.Collections.Specialized.NameValueCollection data = controller.HttpContext.GetRequestQueryData();
 
             var fieldName = FieldName ?? parameterName;
             if (!data.ContainsKey(fieldName) && BadRequestIfMissing)
@@ -147,7 +147,7 @@ namespace EmbedIO.WebApi
 
             if (type.IsArray)
             {
-                var fieldValues = data.GetValues(fieldName) ?? Array.Empty<string>();
+                var fieldValues = data.GetValues(fieldName) ??[];
                 if (!FromString.TryConvertTo(type, fieldValues, out var result))
                     throw HttpException.BadRequest($"Cannot convert field {fieldName} to an array of {type.GetElementType().Name}.");
 

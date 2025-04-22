@@ -13,8 +13,8 @@ namespace EmbedIO.Routing
     /// </summary>
     public sealed class RouteMatcher : IEquatable<RouteMatcher>
     {
-        private static readonly object SyncRoot = new object();
-        private static readonly Dictionary<(bool, string), RouteMatcher> Cache = new Dictionary<(bool, string), RouteMatcher>();
+        private static readonly object SyncRoot = new();
+        private static readonly Dictionary<(bool, string), RouteMatcher> Cache = new();
 
         private readonly Regex _regex;
 
@@ -58,7 +58,7 @@ namespace EmbedIO.Routing
         /// <seealso cref="ClearCache"/>
         public static RouteMatcher Parse(string route, bool isBaseRoute)
         {
-            var exception = TryParseInternal(route, isBaseRoute, out var result);
+            Exception? exception = TryParseInternal(route, isBaseRoute, out RouteMatcher? result);
             if (exception != null)
                 throw exception;
 
@@ -143,7 +143,7 @@ namespace EmbedIO.Routing
                     return RouteMatch.UnsafeFromBasePath(Route, path);
             }
 
-            var match = _regex.Match(path);
+            Match match = _regex.Match(path);
             if (!match.Success)
                 return null;
 
@@ -160,7 +160,8 @@ namespace EmbedIO.Routing
             {
                 string? pattern = null;
                 var parameterNames = new List<string>();
-                var exception = Routing.Route.ParseInternal(route, isBaseRoute, (_, n, p) => {
+                Exception? exception = Routing.Route.ParseInternal(route, isBaseRoute, (_, n, p) =>
+                {
                     parameterNames.AddRange(n);
                     pattern = p;
                 });

@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Globalization;
-using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
+
 using EmbedIO.Internal;
 using EmbedIO.Sessions;
 using EmbedIO.Utilities;
+
 using Swan.Configuration;
 using Swan.Logging;
 
@@ -23,7 +24,7 @@ namespace EmbedIO
     {
         private readonly WebModuleCollection _modules;
 
-        private readonly MimeTypeCustomizer _mimeTypeCustomizer = new MimeTypeCustomizer();
+        private readonly MimeTypeCustomizer _mimeTypeCustomizer = new();
 
         private ExceptionHandlerCallback _onUnhandledException = ExceptionHandler.Default;
         private HttpExceptionHandlerCallback _onHttpException = HttpExceptionHandler.Default;
@@ -105,7 +106,7 @@ namespace EmbedIO
             {
                 EnsureConfigurationNotLocked();
                 _onUnhandledException = Validate.NotNull(nameof(value), value);
-            } 
+            }
         }
 
         /// <inheritdoc />
@@ -142,9 +143,10 @@ namespace EmbedIO
             get => _state;
             private set
             {
-                if (value == _state) return;
+                if (value == _state)
+                    return;
 
-                var oldState = _state;
+                WebServerState oldState = _state;
                 _state = value;
 
                 if (_state != WebServerState.Created)

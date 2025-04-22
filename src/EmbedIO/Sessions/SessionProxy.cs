@@ -123,14 +123,14 @@ namespace EmbedIO.Sessions
         }
 
         /// <inheritdoc/>
-        public bool TryGetValue(string key, out object value)
+        public bool TryGetValue(string key, out object? value)
         {
             EnsureSessionExists();
             return _session!.TryGetValue(key, out value);
         }
 
         /// <inheritdoc/>
-        public bool TryRemove(string key, out object value)
+        public bool TryRemove(string key, out object? value)
         {
             EnsureSessionExists();
             return _session!.TryRemove(key, out value);
