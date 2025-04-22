@@ -107,9 +107,21 @@ namespace EmbedIO.Samples
             // Be sure to run in parallel.
             await Task.Yield();
 
+            // Validate the URL against a whitelist or use a default safe URL.
+            var allowedUrl = "http://localhost:8877"; // Default safe URL
+            if (Uri.TryCreate(url, UriKind.Absolute, out var validatedUrl) &&
+                (validatedUrl.Host == "localhost" || validatedUrl.Host == "127.0.0.1"))
+            {
+                allowedUrl = validatedUrl.ToString();
+            }
+            else
+            {
+                "Invalid or unsafe URL provided. Using default URL.".Warn(nameof(Program));
+            }
+
             // Fire up the browser to show the content!
             using var browser = new Process();
-            browser.StartInfo = new ProcessStartInfo(new Uri(url).ToString()) {
+            browser.StartInfo = new ProcessStartInfo(allowedUrl) {
                 UseShellExecute = true
             };
             browser.Start();
