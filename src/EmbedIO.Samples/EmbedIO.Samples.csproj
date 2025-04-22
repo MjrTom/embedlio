@@ -1,24 +1,24 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFrameworks>net8.0</TargetFrameworks>
     <AssemblyName>EmbedIO.Samples</AssemblyName>
     <OutputType>Exe</OutputType>
     <IsPackable>false</IsPackable>
+    <RepositoryUrl>https://github.com/MjrTom/embedlio/</RepositoryUrl>
   </PropertyGroup>
-
   <ItemGroup>
     <None Update="html\**\*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-
   <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Tubular.ServerSide" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\EmbedIO\EmbedIO.csproj" />
   </ItemGroup>
-
 </Project>

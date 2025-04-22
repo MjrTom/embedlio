@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
@@ -118,8 +118,10 @@ namespace EmbedIO.Testing.Internal
             if (method == System.Net.Http.HttpMethod.Options)
                 return HttpVerbs.Options;
             
+#if NETSTANDARD2_0
             if (method == AdditionalHttpMethods.Patch)
                 return HttpVerbs.Patch;
+#endif
 
             if (method == System.Net.Http.HttpMethod.Post)
                 return HttpVerbs.Post;

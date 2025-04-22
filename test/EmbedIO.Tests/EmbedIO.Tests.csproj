@@ -1,14 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFrameworks>net8.0;netstandard2.0</TargetFrameworks>
     <TestProjectType>UnitTest</TestProjectType>
+    <RepositoryUrl>https://github.com/MjrTom/embedlio/</RepositoryUrl>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="coverlet.msbuild">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
     <packagereference Include="NUnit3TestAdapter">
@@ -17,9 +20,7 @@
     </packagereference>
     <PackageReference Include="NUnit" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\src\EmbedIO.Testing\EmbedIO.Testing.csproj" />
   </ItemGroup>
-
 </Project>
