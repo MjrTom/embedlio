@@ -20,6 +20,11 @@ namespace EmbedIO.Samples
         private static void Main(string[] args)
         {
             var url = args.Length > 0 ? args[0] : "http://*:8877";
+            if (!Uri.TryCreate(url, UriKind.Absolute, out var validatedUrl) || (validatedUrl.Scheme != Uri.UriSchemeHttp && validatedUrl.Scheme != Uri.UriSchemeHttps))
+            {
+                Console.WriteLine("Invalid URL provided. Using default URL: http://localhost:8877");
+                url = "http://localhost:8877";
+            }
 
             using (var ctSource = new CancellationTokenSource())
             {
@@ -104,7 +109,7 @@ namespace EmbedIO.Samples
 
             // Fire up the browser to show the content!
             using var browser = new Process();
-            browser.StartInfo = new ProcessStartInfo(url) {
+            browser.StartInfo = new ProcessStartInfo(new Uri(url).ToString()) {
                 UseShellExecute = true
             };
             browser.Start();
