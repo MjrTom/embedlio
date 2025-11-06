@@ -10,11 +10,4 @@ updates:
     schedule:
       interval: "monthly"
     open-pull-requests-limit: 100
-  - package-ecosystem: "dotnet-sdk" # See documentation for possible values
-    directory: "/src/"  # Location of package manifests
-    schedule:
-      interval: "monthly"
-  - package-ecosystem: "github-actions" # See documentation for possible values
-    directory: "/.github"  # Location of package manifests
-    schedule:
-      interval: "monthly"
+    
