@@ -19,6 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="NUnit3TestAdapter" />
     <ProjectReference Include="..\..\src\EmbedIO.Testing\EmbedIO.Testing.csproj" />
   </ItemGroup>
 
